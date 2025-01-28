@@ -1,3 +1,6 @@
+
+
+
 // Fetch all courses
 function getCourses() {
     // Retrieve courses from LocalStorage/Firebase
