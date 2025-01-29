@@ -30,10 +30,12 @@ The following outlines the organization of the project files and directories, en
 ```
 e-learning-system/               # Root directory of the project
 ├── README.md                    # Project instructions and guidelines
-├── admin.html                   # Admin dashboard
-├── course.html                  # Course content page
 ├── index.html                   # Login/Register page
 ├── student.html                 # Student dashboard
+├── course.html                  # Course details and enrollment page
+├── course-progress.html         # Track student’s progress in a course
+├── lesson.html                  # Lesson content (videos, quizzes, PDFs)
+├── admin.html                   # Admin dashboard
 ├── wishlist.html                # Wishlist page
 ├── firebase/                    # Firebase-related files
 │   ├── config.js                # Firebase configuration
@@ -41,6 +43,7 @@ e-learning-system/               # Root directory of the project
 ├── assets/                      # Directory for assets
 │   ├── css/                     # Styling files
 │   │   ├── admin.css            # Admin-specific styles
+│   │   ├── student.css          # Student-specific styles
 │   │   └── styles.css           # Main CSS file for the application
 │   ├── images/                  # Folder for images used in the project
 │   └── js/                      # JavaScript files
@@ -50,7 +53,10 @@ e-learning-system/               # Root directory of the project
 │       ├── categories.js        # Category-related logic (CRUD)
 │       ├── storage.js           # LocalStorage/Firebase utility functions
 │       ├── students.js          # Student progress tracking
-│       └── ui.js                # UI-related functions
+│       ├── ui.js                # UI-related functions
+│       ├── course-progress.js   # Logic for tracking course progress
+│       ├── lesson.js            # Handling lesson content and interactions
+
 ```
 
 ## Collaboration Instructions

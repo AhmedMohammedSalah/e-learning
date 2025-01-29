@@ -1,14 +1,26 @@
-// Get student progress
-function getStudentProgress(studentId) {
-    // Fetch progress data
-}
+// getStudentById(studentId)
+// Fetches student details.
+function getStudentById(studentId) {}
 
-// Update student progress
-function updateStudentProgress(studentId, progressData) {
-    // Update progress in LocalStorage/Firebase
-}
+// updateStudentProgress(studentId, courseId, progress)
+// Updates course progress.
+function updateStudentProgress(studentId, courseId, progress) {}
 
-// Track course completion
-function trackCompletion(studentId, courseId) {
-    // Mark course as completed
+// getStudentProgress(studentId, courseId)
+// Gets progress data.
+function getStudentProgress(studentId, courseId) {}
+
+// addToWishlist(studentId, courseId)
+// Adds a course to wishlist.
+function addToWishlist(studentId, courseId) {}
+
+// removeFromWishlist(studentId, courseId)
+// Removes a course from wishlist.
+function removeFromWishlist(studentId, courseId) {}
+
+// getWishlist(studentId)
+// Retrieves wishlist.
+function getWishlist(studentId) {
+
+    
 }

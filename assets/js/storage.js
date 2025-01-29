@@ -1,19 +1,15 @@
+// saveToLocalStorage(key, value)
+// Stores data locally.
+function saveToLocalStorage(key, value) {}
 
-var x = 10;
+// getFromLocalStorage(key)
+// Retrieves stored data.
+function getFromLocalStorage(key) {}
 
-// Retrieve data from LocalStorage/Firebase
-function fetchData(key) {
-    // LocalStorage or Firebase logic
-    console.log("hi from jstorage");
-    
-}
+// syncLocalStorageWithFirebase()
+// Syncs local storage with Firebase.
+function syncLocalStorageWithFirebase() {}
 
-// Save data to LocalStorage/Firebase
-function saveData(key, data) {
-    // Save logic
-}
-
-// Remove data from LocalStorage/Firebase
-function removeData(key) {
-    // Remove logic
-}
+// clearLocalStorage()
+// Clears all stored data.
+function clearLocalStorage() {}

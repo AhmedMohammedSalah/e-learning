@@ -1,14 +1,25 @@
-// Display courses in a grid
-function renderCourses(courseList) {
-    // Create HTML elements dynamically
-}
+// showSuccessMessage(message)
+// Displays a success message.
+function showSuccessMessage(message) {}
 
-// Show error or success messages
-function showAlert(message, type) {
-    // Display alert with custom message
-}
+// showErrorMessage(message)
+// Displays an error message.
+function showErrorMessage(message) {}
 
-// Toggle modals (for course details)
-function toggleModal(modalId) {
-    // Open or close modal
+// updateNavbarBasedOnUser()
+// Updates navbar dynamically.
+function updateNavbarBasedOnUser() {}
+
+// renderUserGreeting()
+// Shows "Hello, [User]" on student/admin pages.
+function renderUserGreeting() {}
+
+// toggleLoadingSpinner(show)
+// Displays or hides a loading spinner.
+function toggleLoadingSpinner(show) {}
+
+// createCourseCard(course)
+// Creates a course card.
+function createCourseCard ( course ) {
+    
 }
