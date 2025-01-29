@@ -19,7 +19,9 @@ function editCourse(courseId, updatedData) {
 // Delete a course (Admin only)
 function deleteCourse(courseId) {
     // Remove course from LocalStorage/Firebase
-}
+} 
+
+// 
 
 // Filter courses by category
 function filterCoursesByCategory(category) {
