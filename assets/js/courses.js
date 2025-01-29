@@ -25,3 +25,5 @@ function deleteCourse(courseId) {
 function filterCoursesByCategory(category) {
     // Return filtered course list
 }
+
+fetchData("asd");

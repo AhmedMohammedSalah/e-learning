@@ -4,6 +4,8 @@ var x = 10;
 // Retrieve data from LocalStorage/Firebase
 function fetchData(key) {
     // LocalStorage or Firebase logic
+    console.log("hi from jstorage");
+    
 }
 
 // Save data to LocalStorage/Firebase
