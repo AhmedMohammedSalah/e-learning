@@ -1,25 +1,98 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./assets/css/styles.css">
-    <title>E-Learning</title>
+    <title>LearnEase - Kids Learning Center</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Handlee&family=Nunito&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+   
 </head>
+
 <body>
     <header>
-        <input type="text" id="searchInput" placeholder="Search courses...">
-        <select id="categoryFilter">
-            <option value="">All Categories</option>
-        </select>
+        <!-- nav bar section -->
+      
+        <nav class="navbar">
+            <a href="#" class="navbar-brand">
+                <i class="flaticon-043-teddy-bear"></i>
+                <span class="logo">LearnEase</span>
+            </a>
+           
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="navbar-collapse">
+                <ul>
+                    <li><a href="#" class="active"> Home</a></li>
+                    <li><a href="#"> Courses</a></li>
+                    <li><a href="#">Search</a></li>
+                    <li><a href="#"> About</a></li>
+                </ul>
+            </div>
+        </nav>
+ 
     </header>
+
     <main>
-        <div id="coursesContainer"></div>
+        <!-- Hero Section -->
+        <div class="hero-section">
+            <div class="hero-content">
+                <h4>LearnEase Website!</h4>
+                <h1>Welcome to LearnEase – Where Learning Meets Simplicity!</h1>
+                <p>At LearnEase, we believe that education should be simple, accessible, and engaging for everyone.
+                    Start learning today and take a step toward a brighter future! 🚀📚.</p>
+                <a href="#" class="btn btn-primary">Learn More</a>
+            </div>
+            <div class="hero-image">
+                <img class="mainImage" src="./assets/images/mainImage.jpg" alt="Learning Image">
+            </div>
+        </div>
+
+        <!-- Facilities Section -->
+        <div class="facilities-section">
+            <div class="facility-card">
+                <i class="flaticon-050-fence"></i>
+                <h4>Programming and Coding</h4>
+                <p>
+                   In this course, you will learn how to write code and develop software applications using languages like Python, Java, and C++.</p>
+            </div>
+            <div class="facility-card">
+                <i class="flaticon-022-drum"></i>
+                <h4>Mathematics and Logic</h4>
+                <p>
+                    This course helps students to improve their mathematical skills, focusing on algebra, calculus, and logic to solve complex problems.
+                    
+                    </p>
+            </div>
+            <div class="facility-card">
+                <i class="flaticon-030-crayons"></i>
+                <h4>Web Development</h4>
+                <p>
+                    "This course covers strategies and techniques in digital marketing, including SEO, social media, content creation, and online advertising</p>
+            </div>
+            <div class="facility-card">
+                <i class="flaticon-017-toy-car"></i>
+                <h4>Creative Writing</h4>
+                <p>
+                    Explore your creative potential in this course, where you'll learn the art of storytelling, writing compelling narratives, and developing characters</p>
+            </div>
+            <div class="facility-card">
+                <i class="flaticon-025-sandwich"></i>
+                <h4>Data Science and Analytics</h4>
+                <p>This course introduces you to the world of data analysis, where you’ll learn how to collect, clean, and interpret data using tools like Python and R</p>
+            </div>
+            <div class="facility-card">
+                <i class="flaticon-047-backpack"></i>
+                <h4>Digital Marketing</h4>
+                <p>This course covers strategies and techniques in digital marketing, including SEO, social media, content creation, and online advertising</p>
+            </div>
+        </div>
     </main>
-    <script src="assets/js/index.js"></script>
-    <script src="assets/js/courses.js"></script>
-    <script src="assets/js/storage.js"></script>
-    <script src="assets/js/auth.js"></script>
-    <script src="assets/js/ui.js"></script>
+
+  
 </body>
+
 </html>
