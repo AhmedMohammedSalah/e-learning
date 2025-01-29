@@ -1,3 +1,6 @@
+
+var x = 10;
+
 // Retrieve data from LocalStorage/Firebase
 function fetchData(key) {
     // LocalStorage or Firebase logic
