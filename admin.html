@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="./assets/css/admin.css">
+</head>
+
+<body>
+    <!-- Sidebar Navigation -->
+    <div class="sidebar">
+        <h2>Admin Panel</h2>
+        <ul>
+            <li><a href="#dashboard">Dashboard</a></li>
+            <li><a href="#courses">Courses</a></li>
+            <li><a href="#categories">Categories</a></li>
+            <li><a href="#students">Students</a></li>
+            <li><a href="#approvals">Approvals</a></li>
+            <li class="logout-link"><a href="#" onclick="logout()">Logout</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <header>
+            <h1>Welcome, Admin</h1>
+            <p>Manage courses, categories, and students efficiently.</p>
+        </header>
+
+        <!-- Courses Section -->
+        <section id="courses" class="section">
+            <h2>Manage Courses</h2>
+            <button class="add-btn" onclick="openForm('courseForm')">+ Add New Course</button>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Instructor</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Duration</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>JavaScript Basics</td>
+                        <td>John Doe</td>
+                        <td>Programming</td>
+                        <td>Free</td>
+                        <td>4 Weeks</td>
+                        <td>
+                            <button class="edit" onclick="openForm('editCourseForm')">Edit</button>
+                            <button class="delete">Delete</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Categories Section -->
+        <section id="categories" class="section">
+            <h2>Manage Categories</h2>
+            <button class="add-btn" onclick="openForm('categoryForm')">+ Add New Category</button>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Category Name</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Programming</td>
+                        <td>
+                            <button class="edit" onclick="openForm('editCategoryForm')">Edit</button>
+                            <button class="delete">Delete</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Students Section -->
+        <section id="students" class="section">
+            <h2>Student Progress</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Student Name</th>
+                        <th>Course</th>
+                        <th>Progress</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>John Doe</td>
+                        <td>JavaScript Basics</td>
+                        <td>75%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+            <!-- Approvals Section -->
+            <section id="approvals" class="section">
+                <h2>Course Approvals</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Student Name</th>
+                            <th>Requested Course</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Jane Smith</td>
+                            <td>Python for Beginners</td>
+                            <td>
+                                <button class="approve">Approve</button>
+                                <button class="reject">Reject</button>
+                            </td>
+                        </tr>
+    <tr>
+        <td>Jane Smith</td>
+        <td>Python for Beginners</td>
+        <td>
+            <button class="approve">Approve</button>
+            <button class="reject">Reject</button>
+        </td>
+    </tr>
+    <tr>
+        <td>Jane Smith</td>
+        <td>Python for Beginners</td>
+        <td>
+            <button class="approve">Approve</button>
+            <button class="reject">Reject</button>
+        </td>
+    </tr>
+    <tr>
+        <td>Jane Smith</td>
+        <td>Python for Beginners</td>
+        <td>
+            <button class="approve">Approve</button>
+            <button class="reject">Reject</button>
+        </td>
+    </tr>
+                </tbody>
+            </table>
+        </section>
+    </div>
+
+    <!-- Course Form (Add) -->
+    <div id="courseForm" class="form-popup">
+        <div class="form-container">
+            <h2>Add New Course</h2>
+            <label>Title:</label>
+            <input type="text" id="course-title" placeholder="Enter course title">
+
+            <label>Image:</label>
+            <input type="file" id="course-image">
+
+            <label>Category:</label>
+            <select id="course-category">
+                <option value="Programming">Programming</option>
+                <option value="Business">Business</option>
+                <option value="Design">Design</option>
+            </select>
+
+            <label>Instructor Name:</label>
+            <input type="text" id="instructor-name" placeholder="Enter instructor name">
+
+            <label>Description:</label>
+            <textarea id="course-desc" placeholder="Enter course description"></textarea>
+
+            <label>Price (if applicable):</label>
+            <input type="text" id="course-price" placeholder="Enter price or 'Free'">
+
+            <label>Duration:</label>
+            <input type="text" id="course-duration" placeholder="Enter duration (e.g., 4 weeks)">
+
+            <label>Content (Videos, PDFs, etc.):</label>
+            <input type="file" id="course-content" multiple>
+
+            <button class="submit-btn">Save</button>
+            <button class="close-btn" onclick="closeForm('courseForm')">Close</button>
+        </div>
+    </div>
+
+    <!-- Course Form (Edit) -->
+    <div id="editCourseForm" class="form-popup">
+        <div class="form-container">
+            <h2>Edit Course</h2>
+            <label>Course ID:</label>
+            <input type="text" id="course-id" value="12345" disabled>
+
+            <label>Title:</label>
+            <input type="text" id="edit-course-title">
+
+            <label>Image:</label>
+            <input type="file" id="edit-course-image">
+
+            <label>Category:</label>
+            <select id="edit-course-category"></select>
+
+            <label>Instructor Name:</label>
+            <input type="text" id="edit-instructor-name">
+
+            <label>Description:</label>
+            <textarea id="edit-course-desc"></textarea>
+
+            <label>Price:</label>
+            <input type="text" id="edit-course-price">
+
+            <label>Duration:</label>
+            <input type="text" id="edit-course-duration">
+
+            <label>Content:</label>
+            <input type="file" id="edit-course-content" multiple>
+
+            <button class="submit-btn">Update</button>
+            <button class="close-btn" onclick="closeForm('editCourseForm')">Close</button>
+        </div>
+    </div>
+
+    <!-- Category Form -->
+    <div id="categoryForm" class="form-popup">
+        <div class="form-container">
+            <h2>Add Category</h2>
+            <label>Category Name:</label>
+            <input type="text" id="category-name" placeholder="Enter category name">
+
+            <button class="submit-btn">Save</button>
+            <button class="close-btn" onclick="closeForm('categoryForm')">Close</button>
+        </div>
+    </div>
+
+    <!-- Category Edit Form -->
+    <div id="editCategoryForm" class="form-popup">
+        <div class="form-container">
+            <h2>Edit Category</h2>
+            <label>Category ID:</label>
+            <input type="text" id="category-id" value="C123" disabled>
+
+            <label>Category Name:</label>
+            <input type="text" id="edit-category-name">
+
+            <button class="submit-btn">Update</button>
+            <button class="close-btn" onclick="closeForm('editCategoryForm')">Close</button>
+        </div>
+    </div>
+
+    <script>
+        // Function to Open Form Modal
+        function openForm ( formId ) {
+            document.getElementById( formId ).style.display = "block";
+        }
+
+        // Function to Close Form Modal
+        function closeForm ( formId ) {
+            document.getElementById( formId ).style.display = "none";
+        }
+
+        // Approval & Rejection Logic
+        document.addEventListener( "DOMContentLoaded", function () {
+            document.querySelectorAll( ".approve" ).forEach( button => {
+                button.addEventListener( "click", function () {
+                    this.closest( "tr" ).innerHTML = "<td colspan='3' style='text-align:center; color: var(--success);'>Approved ✅</td>";
+                } );
+            } );
+
+            document.querySelectorAll( ".reject" ).forEach( button => {
+                button.addEventListener( "click", function () {
+                    this.closest( "tr" ).innerHTML = "<td colspan='3' style='text-align:center; color: var(--danger);'>Rejected ❌</td>";
+                } );
+            } );
+        } );
+    </script>
+</body>
+
+</html>
