@@ -44,5 +44,5 @@ function getCurrentUser() {
 // Redirects user to login page if they are not authenticated.
 function redirectIfNotLoggedIn() {
   // 1. Check if user is logged in.
-  // 2. If not, redirect to index.html.
+  // 2. If not, redirect to register.html.
 }
