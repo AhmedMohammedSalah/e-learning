@@ -3,28 +3,222 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Course Page</title>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            color: white;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Navigation Bar */
+        .navbar {
+            background-color: #003b4d;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+        }
+
+        .logo {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            background: white;
+            padding: 8px;
+            border-radius: 5px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #007b8f;
+            margin: 0 10px;
+            font-size: 16px;
+        }
+
+        .nav-links .active {
+            background: #ffcc00;
+            padding: 5px 10px;
+            border-radius: 5px;
+            color: black;
+        }
+
+        /* Page Content */
+        .container {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+        }
+
+        .video-container {
+            width: 65%;
+        }
+
+        .course-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #003b4d;
+            text-align: left;  /* Title aligned to the left */
+            margin-bottom: 10px;
+        }
+
+        iframe {
+            width: 100%;
+            height: 400px;
+            border: none;
+            border-radius: 10px;
+        }
+
+        .course-description {
+            background: #e9ecef;
+            color: #003b4d;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            font-size: 16px;
+        }
+
+        .content-container {
+            width: 30%;
+            background-color: #17a2b8;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        h2 {
+            color: #f8f9fa;
+            text-align: center;
+        }
+
+        .course-item {
+            background: #00394f;
+            padding: 15px;
+            margin: 5px 0;
+            border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .course-item:hover {
+            background: #ffcc00;
+            color: #000;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        button {
+            background: #00394f;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #e6b800;
+            color: black;
+        }
+
+    </style>
 </head>
 <body>
-    
 
+    <!-- Navigation Bar -->
+    <div class="navbar">
+        <div class="logo">LearnEase</div>
+        <div class="nav-links">
+            <a href="#" class="active">Home</a>
+            <a href="#">Courses</a>
+            <a href="#">Search</a>
+            <a href="#">About</a>
+        </div>
+    </div>
 
+    <!-- Main Content -->
+    <div class="container">
+        <div class="video-container">
+            <div class="course-title" id="course-title">Introduction to the Course</div>
+            <iframe id="course-video" src="https://www.youtube.com/embed/dQw4w9WgXcQ" allowfullscreen></iframe>
+            <div class="course-description" id="course-description">
+                This course provides an overview of the essential tools and techniques needed to start your learning journey. 
+                You will gain a solid foundation and hands-on experience through interactive lessons.
+            </div>
+        </div>
 
+        <div class="content-container">
+            <h2>Course Content</h2>
+            <div class="course-item" onclick="loadVideo(0)">Introduction to the Course</div>
+            <div class="course-item" onclick="loadVideo(1)">Understanding Basic Tools</div>
+            <div class="course-item" onclick="loadVideo(2)">Advanced Techniques</div>
+            <div class="course-item" onclick="loadVideo(3)">Final Project</div>
 
+            <div class="buttons">
+                <button onclick="prevVideo()">Previous</button>
+                <button onclick="nextVideo()">Next</button>
+            </div>
+        </div>
+    </div>
 
+    <script>
+        const videos = [
+            {
+                title: "Introduction to the Course",
+                url: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+                description: "This course provides an overview of the essential tools and techniques needed to start your learning journey. You will gain a solid foundation and hands-on experience through interactive lessons."
+            },
+            {
+                title: "Understanding Basic Tools",
+                url: "https://www.youtube.com/embed/3JZ_D3ELwOQ",
+                description: "Learn about the fundamental tools used in this field. This module covers everything from setup to best practices."
+            },
+            {
+                title: "Advanced Techniques",
+                url: "https://www.youtube.com/embed/LXb3EKWsInQ",
+                description: "Dive into advanced methodologies and techniques to enhance your expertise in this area."
+            },
+            {
+                title: "Final Project",
+                url: "https://www.youtube.com/embed/oHg5SJYRHA0",
+                description: "Apply what you've learned by working on a final project that showcases your skills and knowledge."
+            }
+        ];
 
+        let currentVideo = 0;
 
+        function loadVideo(index) {
+            currentVideo = index;
+            document.getElementById("course-video").src = videos[currentVideo].url;
+            document.getElementById("course-title").innerText = videos[currentVideo].title;
+            document.getElementById("course-description").innerText = videos[currentVideo].description;
+        }
 
+        function nextVideo() {
+            if (currentVideo < videos.length - 1) {
+                currentVideo++;
+                loadVideo(currentVideo);
+            }
+        }
 
-   
-    
-    <script src="assets/js/storage.js"></script> <!-- Handles Local Storage -->
-    <script src="assets/js/auth.js"></script> <!-- User Authentication -->
-    <script src="assets/js/courses.js"></script> <!-- Course-related logic -->
-    <script src="assets/js/students.js"></script> <!-- Student progress tracking -->
-    <script src="assets/js/course-progress.js"></script> <!-- Course Progress Handling -->
-    <script src="assets/js/lesson.js"></script> <!-- Lesson Handling -->
-    <script src="assets/js/ui.js"></script> <!-- UI Handling -->
+        function prevVideo() {
+            if (currentVideo > 0) {
+                currentVideo--;
+                loadVideo(currentVideo);
+            }
+        }
+    </script>
 
 </body>
 </html>
