@@ -4,6 +4,7 @@
 // Fetch all courses
 function getCourses() {
     // Retrieve courses from LocalStorage/Firebase
+
 }
 
 // Add a new course (Admin only)
@@ -26,4 +27,5 @@ function filterCoursesByCategory(category) {
     // Return filtered course list
 }
 
-fetchData("asd");
+fetchData( "asd" );
+// var xc = "ahmed";

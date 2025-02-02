@@ -1,146 +1,149 @@
-// Validate input fields for login/register
-function validateAuthFields(fields) {
-  // Ensure all fields are filled and valid
-}
-
-// Log in the user
-function loginUser(email, password) {
-  // Fetch user data from LocalStorage/Firebase
-  // Return user object or false
-}
-
-// Register a new user
-function registerUser(userDetails) {
-  // Add user to LocalStorage/Firebase
-  // Perform validation
-}
-
-// Log out the user
-function logoutUser() {
-  // Clear session data
-}
-
-// Function to handle form submission
-var registryForm = document.getElementById("registration-form");
-if (registryForm) {
-  registryForm.addEventListener("submit", function (event) {
-    event.preventDefault();
-
-    // Get form values
-    const name = document.getElementById("name").value;
-    const phone = document.getElementById("phone").value;
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-    const gender = document.getElementById("gender").value;
-
-    // Validate email
-    if (!validateEmail(email)) {
-      document.getElementById("emailError").textContent =
-        "Please enter a valid email address.";
-      return;
-    } else {
-      document.getElementById("emailError").textContent = "";
-    }
-
-    // Validate password (minimum 6 characters)
-    if (password.length < 6) {
-      alert("Password must be at least 6 characters long.");
-      return;
-    }
-
-    // Register user with Firebase Authentication
-    auth
-      .createUserWithEmailAndPassword(email, password)
-      .then((userCredential) => {
-        console.log("User registered successfully:", userCredential.user);
-        const user = userCredential.user;
-
-        // Save user data to Firebase Realtime Database
-        const userData = {
-          name: name,
-          phone: phone,
-          email: email,
-          gender: gender,
-          last_login: Date.now(),
-        };
-
-        const databaseRef = database.ref("users/" + user.uid);
-        databaseRef
-          .set(userData)
-          .then(() => {
-            console.log("User data saved successfully!");
-            alert("Registration successful! Redirecting to login page...");
-            window.location.href = "login.html";
-          })
-          .catch((error) => {
-            console.error("Error saving user data: ", error);
-            alert("Error saving user data: " + error.message);
-          });
-      })
-      .catch((error) => {
-        console.error("Error during registration: ", error);
-        alert("Error: " + error.message);
-      });
-  });
-}
-// Function to validate email
-function validateEmail(email) {
+// Utility Functions
+const validateEmail = (email) => {
   const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return regex.test(email);
+};
+
+const validatePassword = (password) => {
+  return password.length >= 6;
+};
+
+const showError = (elementId, message) => {
+  const errorElement = document.getElementById(elementId);
+  if (errorElement) {
+    errorElement.textContent = message;
+  }
+};
+
+const clearError = (elementId) => {
+  const errorElement = document.getElementById(elementId);
+  if (errorElement) {
+    errorElement.textContent = "";
+  }
+};
+
+// Firebase Functions
+const registerUserWithFirebase = async (email, password, userDetails) => {
+  try {
+    const userCredential = await auth.createUserWithEmailAndPassword(
+      email,
+      password
+    );
+    const user = userCredential.user;
+
+    const databaseRef = database.ref("users/" + user.uid);
+    await databaseRef.set(userDetails);
+
+    console.log("User registered and data saved successfully!");
+    return user;
+  } catch (error) {
+    console.error("Error during registration: ", error);
+    throw error;
+  }
+};
+
+const loginUserWithFirebase = async (email, password) => {
+  try {
+    const userCredential = await auth.signInWithEmailAndPassword(
+      email,
+      password
+    );
+    const user = userCredential.user;
+
+    const databaseRef = database.ref("users/" + user.uid);
+    const snapshot = await databaseRef.once("value");
+    const userData = snapshot.val();
+
+    if (!userData) {
+      throw new Error("User data not found in database.");
+    }
+
+    console.log("User data fetched successfully:", userData);
+    return userData;
+  } catch (error) {
+    console.error("Error during login: ", error);
+    throw error;
+  }
+};
+
+// Form Handlers
+const handleRegistration = async (event) => {
+  event.preventDefault();
+
+  const name = document.getElementById("name").value;
+  const phone = document.getElementById("phone").value;
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  const gender = document.getElementById("gender").value;
+
+  // Validate email
+  if (!validateEmail(email)) {
+    showError("emailError", "Please enter a valid email address.");
+    return;
+  } else {
+    clearError("emailError");
+  }
+
+  // Validate password
+  if (!validatePassword(password)) {
+    alert("Password must be at least 6 characters long.");
+    return;
+  }
+
+  // Prepare user details
+  const userDetails = {
+    name,
+    phone,
+    email,
+    gender,
+    last_login: Date.now(),
+  };
+
+  try {
+    await registerUserWithFirebase(email, password, userDetails);
+    alert("Registration successful! Redirecting to login page...");
+    window.location.href = "login.html";
+  } catch (error) {
+    alert("Error: " + error.message);
+  }
+};
+
+const handleLogin = async (event) => {
+  event.preventDefault();
+
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  // Validate email
+  if (!validateEmail(email)) {
+    showError("emailError", "Please enter a valid email address.");
+    return;
+  } else {
+    clearError("emailError");
+  }
+
+  // Validate password
+  if (!validatePassword(password)) {
+    alert("Password must be at least 6 characters long.");
+    return;
+  }
+
+  try {
+    await loginUserWithFirebase(email, password);
+    alert("Login successful! Redirecting to Home page...");
+    window.location.href = "../../index.html";
+  } catch (error) {
+    alert("Error: " + error.message);
+  }
+};
+
+// Attach Event Listeners
+const registryForm = document.getElementById("registration-form");
+if (registryForm) {
+  registryForm.addEventListener("submit", handleRegistration);
 }
 
-var loginForm = document.getElementById("login-form");
+const loginForm = document.getElementById("login-form");
 if (loginForm) {
-  loginForm.addEventListener("submit", function (event) {
-    event.preventDefault();
-
-    // Get form values
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-    console.log("data retreved ");
-
-    // Validate email
-    if (!validateEmail(email)) {
-      document.getElementById("emailError").textContent =
-        "Please enter a valid email address.";
-      return;
-    } else {
-      document.getElementById("emailError").textContent = "";
-    }
-
-    // Validate password (minimum 6 characters)
-    if (password.length < 6) {
-      alert("Password must be at least 6 characters long.");
-      return;
-    }
-
-    // Sign in user with Firebase Authentication
-    auth
-      .signInWithEmailAndPassword(email, password)
-      .then((userCredential) => {
-        const user = userCredential.user;
-        // Fetch user data from Firebase Realtime Database
-        const databaseRef = database.ref("users/" + user.uid);
-        databaseRef
-          .once("value")
-          .then((snapshot) => {
-            const userData = snapshot.val();
-            if (userData) {
-              console.log("User data fetched successfully:", userData);
-              alert("Login successful! Redirecting to Home page...");
-              window.location.href = "../../index.html";
-            } else {
-              alert("User data not found in database.");
-            }
-          })
-          .catch((error) => {
-            console.error("Error fetching user data: ", error);
-            alert("Error fetching user data: " + error.message);
-          });
-      })
-      .catch((error) => {
-        console.error("Error during login: ", error);
-        alert("Error: " + error.message);
-      });
-  });
+  loginForm.addEventListener("submit", handleLogin);
 }
