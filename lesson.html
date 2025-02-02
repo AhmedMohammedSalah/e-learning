@@ -65,7 +65,6 @@
             font-weight: bold;
             color: #003b4d;
             text-align: left;
-            /* Title aligned to the left */
             margin-bottom: 10px;
         }
 
@@ -112,6 +111,16 @@
             color: #000;
         }
 
+        .course-item.completed {
+            background: #28a745;
+            color: white;
+        }
+
+        .course-item.current {
+            background: #ffcc00;
+            color: #000;
+        }
+
         .buttons {
             display: flex;
             justify-content: space-between;
@@ -127,11 +136,44 @@
             cursor: pointer;
             font-size: 16px;
             font-weight: bold;
+            transition: 0.3s;
         }
 
-        button:hover {
+        button:hover:not(:disabled) {
             background: #e6b800;
             color: black;
+        }
+
+        button:disabled {
+            background: #cccccc;
+            color: #666666;
+            cursor: not-allowed;
+        }
+
+        .progress-container {
+            margin-top: 20px;
+            background-color: #e9ecef;
+            border-radius: 10px;
+            padding: 10px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 15px;
+            background-color: #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar > div {
+            height: 100%;
+            background-color: #28a745;
+        }
+
+        .progress-text {
+            margin-top: 10px;
+            text-align: center;
+            color: #003b4d;
         }
     </style>
 </head>
@@ -142,8 +184,8 @@
     <div class="navbar">
         <div class="logo">LearnEase</div>
         <div class="nav-links">
-            <a href="#" class="active">Home</a>
-            <a href="#">Courses</a>
+            <a href="#">Home</a>
+            <a href="#" class="active">Courses</a>
             <a href="#">Search</a>
             <a href="#">About</a>
         </div>
@@ -155,9 +197,14 @@
             <div class="course-title" id="course-title">Introduction to the Course</div>
             <iframe id="course-video" src="https://www.youtube.com/embed/dQw4w9WgXcQ" allowfullscreen></iframe>
             <div class="course-description" id="course-description">
-                This course provides an overview of the essential tools and techniques needed to start your learning
-                journey.
+                This course provides an overview of the essential tools and techniques needed to start your learning journey.
                 You will gain a solid foundation and hands-on experience through interactive lessons.
+            </div>
+            <div id="progress-bar-container" class="progress-container">
+                <div class="progress-bar">
+                    <div id="progress-bar" style="width: 0%"></div>
+                </div>
+                <span id="progress-text" class="progress-text">Progress: 0/4 videos completed</span>
             </div>
         </div>
 
@@ -169,8 +216,8 @@
             <div class="course-item" onclick="loadVideo(3)">Final Project</div>
 
             <div class="buttons">
-                <button onclick="prevVideo()">Previous</button>
-                <button onclick="nextVideo()">Next</button>
+                <button id="prev-button" onclick="prevVideo()">Previous</button>
+                <button id="next-button" onclick="nextVideo()">Next</button>
             </div>
         </div>
     </div>
@@ -199,28 +246,62 @@
             }
         ];
 
+        const watchedVideos = new Array(videos.length).fill(false);
         let currentVideo = 0;
 
-        function loadVideo ( index ) {
+        function loadVideo(index) {
             currentVideo = index;
-            document.getElementById( "course-video" ).src = videos[currentVideo].url;
-            document.getElementById( "course-title" ).innerText = videos[currentVideo].title;
-            document.getElementById( "course-description" ).innerText = videos[currentVideo].description;
+            document.getElementById("course-video").src = videos[currentVideo].url;
+            document.getElementById("course-title").innerText = videos[currentVideo].title;
+            document.getElementById("course-description").innerText = videos[currentVideo].description;
+
+            watchedVideos[currentVideo] = true;
+
+            document.querySelectorAll(".course-item").forEach((item, i) => {
+                item.classList.remove("current", "completed");
+                if (i === currentVideo) {
+                    item.classList.add("current");
+                } else if (watchedVideos[i]) {
+                    item.classList.add("completed");
+                }
+            });
+
+            updateProgressBar();
+
+            const prevButton = document.getElementById("prev-button");
+            const nextButton = document.getElementById("next-button");
+
+            prevButton.disabled = currentVideo === 0;
+            nextButton.disabled = currentVideo === videos.length - 1;
         }
 
-        function nextVideo () {
-            if ( currentVideo < videos.length - 1 ) {
+        function updateProgressBar() {
+            const progressBar = document.getElementById("progress-bar");
+            const progressText = document.getElementById("progress-text");
+            const watchedCount = watchedVideos.filter(v => v).length;
+            const progressPercentage = (watchedCount / videos.length) * 100;
+
+            progressBar.style.width = `${progressPercentage}%`;
+            progressText.innerText = `Progress: ${watchedCount}/${videos.length} videos completed`;
+        }
+
+        function nextVideo() {
+            if (currentVideo < videos.length - 1) {
                 currentVideo++;
-                loadVideo( currentVideo );
+                loadVideo(currentVideo);
             }
         }
 
-        function prevVideo () {
-            if ( currentVideo > 0 ) {
+        function prevVideo() {
+            if (currentVideo > 0) {
                 currentVideo--;
-                loadVideo( currentVideo );
+                loadVideo(currentVideo);
             }
         }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            loadVideo(currentVideo);
+        });
     </script>
 
 </body>
