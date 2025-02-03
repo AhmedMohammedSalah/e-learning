@@ -186,8 +186,8 @@
         <div class="nav-links">
             <a href="#">Home</a>
             <a href="#" class="active">Courses</a>
-            <a href="#">Search</a>
             <a href="#">About</a>
+            <a href="register.html">Register</a>
         </div>
     </div>
 
@@ -216,6 +216,7 @@
             <div class="buttons">
                 <button id="prev-button" onclick="prevVideo()">Previous</button>
                 <button id="next-button" onclick="nextVideo()">Next</button>
+                <button id="certificate-button" style="display: none;" onclick="redirectToCertificate()">Get Certificate</button>
             </div>
         </div>
     </div>
@@ -308,9 +309,16 @@
 
             const prevButton = document.getElementById("prev-button");
             const nextButton = document.getElementById("next-button");
+            const certificateButton = document.getElementById("certificate-button");
 
             prevButton.disabled = currentVideo === 0;
-            nextButton.disabled = currentVideo === course.content.length - 1;
+            if (currentVideo === course.content.length - 1) {
+                nextButton.style.display = "none";
+                certificateButton.style.display = "inline-block";
+            } else {
+                nextButton.style.display = "inline-block";
+                certificateButton.style.display = "none";
+            }
         }
 
         function updateProgressBar() {
@@ -335,6 +343,10 @@
                 currentVideo--;
                 loadVideo(currentVideo);
             }
+        }
+
+        function redirectToCertificate() {
+            window.location.href = "certificate.html";
         }
 
         function showLessons() {
