@@ -210,10 +210,9 @@
 
         <div class="content-container">
             <h2>Course Content</h2>
-            <div class="course-item" onclick="loadVideo(0)">Introduction to the Course</div>
-            <div class="course-item" onclick="loadVideo(1)">Understanding Basic Tools</div>
-            <div class="course-item" onclick="loadVideo(2)">Advanced Techniques</div>
-            <div class="course-item" onclick="loadVideo(3)">Final Project</div>
+            <div id="course-content">
+                <!-- Course items will be dynamically inserted here -->
+            </div>
 
             <div class="buttons">
                 <button id="prev-button" onclick="prevVideo()">Previous</button>
@@ -223,37 +222,77 @@
     </div>
 
     <script>
-        const videos = [
-            {
-                title: "Introduction to the Course",
-                url: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-                description: "This course provides an overview of the essential tools and techniques needed to start your learning journey. You will gain a solid foundation and hands-on experience through interactive lessons."
+        const user = {
+            id: "U12345", // Unique user ID
+            name: "John Doe", // Full name of the user
+            email: "john.doe@example.com", // User's email
+            password: "hashedPassword123", // Hashed password for security
+            role: "student", // Role: 'admin' or 'student'
+            enrolledCourses: ["C101", "C102"], // Array of course IDs the user is enrolled in
+            wishlist: ["C103"], // Array of course IDs in the user's wishlist
+            progress: {
+                C101: 75, // Progress percentage for course C101
+                C102: 50, // Progress percentage for course C102
             },
-            {
-                title: "Understanding Basic Tools",
-                url: "https://www.youtube.com/embed/3JZ_D3ELwOQ",
-                description: "Learn about the fundamental tools used in this field. This module covers everything from setup to best practices."
-            },
-            {
-                title: "Advanced Techniques",
-                url: "https://www.youtube.com/embed/LXb3EKWsInQ",
-                description: "Dive into advanced methodologies and techniques to enhance your expertise in this area."
-            },
-            {
-                title: "Final Project",
-                url: "https://www.youtube.com/embed/oHg5SJYRHA0",
-                description: "Apply what you've learned by working on a final project that showcases your skills and knowledge."
-            }
-        ];
+        };
 
-        const watchedVideos = new Array(videos.length).fill(false);
+        const category = {
+            id: "CAT123", // Unique category ID
+            name: "Programming", // Name of the category
+            description: "Courses related to programming and software development.", // Description of the category
+            courses: ["C101", "C102"], // Array of course IDs belonging to this category
+        };
+
+        const course = {
+            id: "C101", // Unique course ID
+            title: "JavaScript Basics", // Title of the course
+            image: "https://example.com/js-basics.jpg", // URL to the course image
+            category: "Programming", // Category ID or name
+            instructor: "Jane Smith", // Name of the instructor
+            description: "Learn the basics of JavaScript programming.", // Course description
+            price: 49.99, // Price of the course (or 'Free' if applicable)
+            duration: "4 Weeks", // Duration of the course
+            content: [
+                {
+                    type: "video", // Type of content (e.g., video, pdf, quiz)
+                    title: "Introduction to JavaScript",
+                    url: "https://www.youtube.com/embed/dQw4w9WgXcQ", // URL to the content
+                },
+                {
+                    type: "video",
+                    title: "Understanding Basic Tools",
+                    url: "https://www.youtube.com/embed/3JZ_D3ELwOQ",
+                },
+                {
+                    type: "video",
+                    title: "Advanced Techniques",
+                    url: "https://www.youtube.com/embed/LXb3EKWsInQ",
+                },
+                {
+                    type: "video",
+                    title: "Final Project",
+                    url: "https://www.youtube.com/embed/oHg5SJYRHA0",
+                },
+            ],
+            studentsEnrolled: ["U12345", "U67890"], // Array of user IDs enrolled in the course
+            ratings: [
+                {
+                    userId: "U12345", // User ID of the reviewer
+                    rating: 4.5, // Rating out of 5
+                    review: "Great course for beginners!", // Review text
+                },
+            ],
+        };
+
+        const watchedVideos = new Array(course.content.length).fill(false);
         let currentVideo = 0;
 
         function loadVideo(index) {
             currentVideo = index;
-            document.getElementById("course-video").src = videos[currentVideo].url;
-            document.getElementById("course-title").innerText = videos[currentVideo].title;
-            document.getElementById("course-description").innerText = videos[currentVideo].description;
+            const video = course.content[currentVideo];
+            document.getElementById("course-video").src = video.url;
+            document.getElementById("course-title").innerText = video.title;
+            document.getElementById("course-description").innerText = course.description;
 
             watchedVideos[currentVideo] = true;
 
@@ -272,21 +311,21 @@
             const nextButton = document.getElementById("next-button");
 
             prevButton.disabled = currentVideo === 0;
-            nextButton.disabled = currentVideo === videos.length - 1;
+            nextButton.disabled = currentVideo === course.content.length - 1;
         }
 
         function updateProgressBar() {
             const progressBar = document.getElementById("progress-bar");
             const progressText = document.getElementById("progress-text");
             const watchedCount = watchedVideos.filter(v => v).length;
-            const progressPercentage = (watchedCount / videos.length) * 100;
+            const progressPercentage = (watchedCount / course.content.length) * 100;
 
             progressBar.style.width = `${progressPercentage}%`;
-            progressText.innerText = `Progress: ${watchedCount}/${videos.length} videos completed`;
+            progressText.innerText = `Progress: ${watchedCount}/${course.content.length} videos completed`;
         }
 
         function nextVideo() {
-            if (currentVideo < videos.length - 1) {
+            if (currentVideo < course.content.length - 1) {
                 currentVideo++;
                 loadVideo(currentVideo);
             }
@@ -299,7 +338,15 @@
             }
         }
 
+        function showLessons() {
+            const courseContent = document.getElementById("course-content");
+            courseContent.innerHTML = course.content.map((lesson, index) => `
+                <div class="course-item" onclick="loadVideo(${index})">${lesson.title}</div>
+            `).join('');
+        }
+
         document.addEventListener("DOMContentLoaded", () => {
+            showLessons();
             loadVideo(currentVideo);
         });
     </script>
