@@ -24,10 +24,12 @@
 
     <!-- Main Content -->
     <div class="main-content">
-        <header>
-            <h1>Welcome, Admin</h1>
-            <p>Manage courses, categories, and students efficiently.</p>
-        </header>
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="section">
+            <h2>Dashboard</h2>
+            <button class="add-btn" onclick="openAddLessonForm()">+ Add Lesson</button>
+            
+        </section>
 
         <!-- Courses Section -->
         <section id="courses" class="section">
@@ -45,17 +47,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>JavaScript Basics</td>
-                        <td>John Doe</td>
-                        <td>Programming</td>
-                        <td>Free</td>
-                        <td>4 Weeks</td>
-                        <td>
-                            <button class="edit" onclick="openForm('editCourseForm')">Edit</button>
-                            <button class="delete">Delete</button>
-                        </td>
-                    </tr>
+                    <!-- سيتم ملء هذا الجدول بالكورسات من Firebase -->
                 </tbody>
             </table>
         </section>
@@ -72,13 +64,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>Programming</td>
-                        <td>
-                            <button class="edit" onclick="openForm('editCategoryForm')">Edit</button>
-                            <button class="delete">Delete</button>
-                        </td>
-                    </tr>
+                    <!-- سيتم ملء هذا الجدول بالفئات من Firebase -->
                 </tbody>
             </table>
         </section>
@@ -95,59 +81,24 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>John Doe</td>
-                        <td>JavaScript Basics</td>
-                        <td>75%</td>
-                    </tr>
+                    <!-- سيتم ملء هذا الجدول ببيانات الطلاب من Firebase -->
                 </tbody>
             </table>
         </section>
 
-            <!-- Approvals Section -->
-            <section id="approvals" class="section">
-                <h2>Course Approvals</h2>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Student Name</th>
-                            <th>Requested Course</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Jane Smith</td>
-                            <td>Python for Beginners</td>
-                            <td>
-                                <button class="approve">Approve</button>
-                                <button class="reject">Reject</button>
-                            </td>
-                        </tr>
-    <tr>
-        <td>Jane Smith</td>
-        <td>Python for Beginners</td>
-        <td>
-            <button class="approve">Approve</button>
-            <button class="reject">Reject</button>
-        </td>
-    </tr>
-    <tr>
-        <td>Jane Smith</td>
-        <td>Python for Beginners</td>
-        <td>
-            <button class="approve">Approve</button>
-            <button class="reject">Reject</button>
-        </td>
-    </tr>
-    <tr>
-        <td>Jane Smith</td>
-        <td>Python for Beginners</td>
-        <td>
-            <button class="approve">Approve</button>
-            <button class="reject">Reject</button>
-        </td>
-    </tr>
+        <!-- Approvals Section -->
+        <section id="approvals" class="section">
+            <h2>Course Approvals</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Student Name</th>
+                        <th>Requested Course</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- سيتم ملء هذا الجدول بطلبات الموافقة من Firebase -->
                 </tbody>
             </table>
         </section>
@@ -165,9 +116,7 @@
 
             <label>Category:</label>
             <select id="course-category">
-                <option value="Programming">Programming</option>
-                <option value="Business">Business</option>
-                <option value="Design">Design</option>
+                <!-- سيتم ملء هذا الـ select بالفئات من Firebase -->
             </select>
 
             <label>Instructor Name:</label>
@@ -185,7 +134,7 @@
             <label>Content (Videos, PDFs, etc.):</label>
             <input type="file" id="course-content" multiple>
 
-            <button class="submit-btn">Save</button>
+            <button class="submit-btn" onclick="addCourse()">Save</button>
             <button class="close-btn" onclick="closeForm('courseForm')">Close</button>
         </div>
     </div>
@@ -233,7 +182,7 @@
             <label>Category Name:</label>
             <input type="text" id="category-name" placeholder="Enter category name">
 
-            <button class="submit-btn">Save</button>
+            <button class="submit-btn" onclick="addCategory()">Save</button>
             <button class="close-btn" onclick="closeForm('categoryForm')">Close</button>
         </div>
     </div>
@@ -253,32 +202,37 @@
         </div>
     </div>
 
-    <script>
-        // Function to Open Form Modal
-        function openForm ( formId ) {
-            document.getElementById( formId ).style.display = "block";
-        }
+    <!-- Add Lesson Form -->
+    <div id="addLessonForm" class="form-popup">
+        <div class="form-container">
+            <h2>Add New Lesson</h2>
+            <label>Course:</label>
+            <select id="lesson-course">
 
-        // Function to Close Form Modal
-        function closeForm ( formId ) {
-            document.getElementById( formId ).style.display = "none";
-        }
+            </select>
 
-        // Approval & Rejection Logic
-        document.addEventListener( "DOMContentLoaded", function () {
-            document.querySelectorAll( ".approve" ).forEach( button => {
-                button.addEventListener( "click", function () {
-                    this.closest( "tr" ).innerHTML = "<td colspan='3' style='text-align:center; color: var(--success);'>Approved ✅</td>";
-                } );
-            } );
+            <label>Lesson Title:</label>
+            <input type="text" id="lesson-title" placeholder="Enter lesson title">
 
-            document.querySelectorAll( ".reject" ).forEach( button => {
-                button.addEventListener( "click", function () {
-                    this.closest( "tr" ).innerHTML = "<td colspan='3' style='text-align:center; color: var(--danger);'>Rejected ❌</td>";
-                } );
-            } );
-        } );
-    </script>
+            <label>Video URL:</label>
+            <input type="text" id="lesson-video-url" placeholder="Enter video URL">
+
+            <label>Description:</label>
+            <textarea id="lesson-desc" placeholder="Enter lesson description"></textarea>
+
+            <button class="submit-btn" onclick="addLesson()">Save</button>
+            <button class="close-btn" onclick="closeForm('addLessonForm')">Close</button>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.7/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.7/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+
+    <!-- JavaScript Code -->
+    <script src="./firebase/config.js"></script>
+    <script src="./assets/js/courses.js"></script>
 </body>
 
 </html>

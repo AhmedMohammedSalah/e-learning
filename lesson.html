@@ -65,7 +65,6 @@
             font-weight: bold;
             color: #003b4d;
             text-align: left;
-            /* Title aligned to the left */
             margin-bottom: 10px;
         }
 
@@ -112,6 +111,16 @@
             color: #000;
         }
 
+        .course-item.completed {
+            background: #28a745;
+            color: white;
+        }
+
+        .course-item.current {
+            background: #ffcc00;
+            color: #000;
+        }
+
         .buttons {
             display: flex;
             justify-content: space-between;
@@ -127,11 +136,44 @@
             cursor: pointer;
             font-size: 16px;
             font-weight: bold;
+            transition: 0.3s;
         }
 
-        button:hover {
+        button:hover:not(:disabled) {
             background: #e6b800;
             color: black;
+        }
+
+        button:disabled {
+            background: #cccccc;
+            color: #666666;
+            cursor: not-allowed;
+        }
+
+        .progress-container {
+            margin-top: 20px;
+            background-color: #e9ecef;
+            border-radius: 10px;
+            padding: 10px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 15px;
+            background-color: #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar>div {
+            height: 100%;
+            background-color: #28a745;
+        }
+
+        .progress-text {
+            margin-top: 10px;
+            text-align: center;
+            color: #003b4d;
         }
     </style>
 </head>
@@ -142,10 +184,10 @@
     <div class="navbar">
         <div class="logo">LearnEase</div>
         <div class="nav-links">
-            <a href="#" class="active">Home</a>
-            <a href="#">Courses</a>
-            <a href="#">Search</a>
+            <a href="#">Home</a>
+            <a href="#" class="active">Courses</a>
             <a href="#">About</a>
+            <a href="register.html">Register</a>
         </div>
     </div>
 
@@ -159,57 +201,140 @@
                 journey.
                 You will gain a solid foundation and hands-on experience through interactive lessons.
             </div>
+            <div id="progress-bar-container" class="progress-container">
+                <div class="progress-bar">
+                    <div id="progress-bar" style="width: 0%"></div>
+                </div>
+                <span id="progress-text" class="progress-text">Progress: 0/4 videos completed</span>
+            </div>
         </div>
 
         <div class="content-container">
             <h2>Course Content</h2>
-            <div class="course-item" onclick="loadVideo(0)">Introduction to the Course</div>
-            <div class="course-item" onclick="loadVideo(1)">Understanding Basic Tools</div>
-            <div class="course-item" onclick="loadVideo(2)">Advanced Techniques</div>
-            <div class="course-item" onclick="loadVideo(3)">Final Project</div>
+            <div id="course-content">
+            </div>
 
             <div class="buttons">
-                <button onclick="prevVideo()">Previous</button>
-                <button onclick="nextVideo()">Next</button>
+                <button id="prev-button" onclick="prevVideo()">Previous</button>
+                <button id="next-button" onclick="nextVideo()">Next</button>
+                <button id="certificate-button" style="display: none;" onclick="redirectToCertificate()">Get
+                    Certificate</button>
             </div>
         </div>
     </div>
 
     <script>
-        const videos = [
-            {
-                title: "Introduction to the Course",
-                url: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-                description: "This course provides an overview of the essential tools and techniques needed to start your learning journey. You will gain a solid foundation and hands-on experience through interactive lessons."
+        const user = {
+            id: "U12345", // Unique user ID
+            name: "John Doe", // Full name of the user
+            email: "john.doe@example.com", // User's email
+            password: "hashedPassword123", // Hashed password for security
+            role: "student", // Role: 'admin' or 'student'
+            enrolledCourses: ["C101", "C102"], // Array of course IDs the user is enrolled in
+            wishlist: ["C103"], // Array of course IDs in the user's wishlist
+            progress: {
+                C101: 75, // Progress percentage for course C101
+                C102: 50, // Progress percentage for course C102
             },
-            {
-                title: "Understanding Basic Tools",
-                url: "https://www.youtube.com/embed/3JZ_D3ELwOQ",
-                description: "Learn about the fundamental tools used in this field. This module covers everything from setup to best practices."
-            },
-            {
-                title: "Advanced Techniques",
-                url: "https://www.youtube.com/embed/LXb3EKWsInQ",
-                description: "Dive into advanced methodologies and techniques to enhance your expertise in this area."
-            },
-            {
-                title: "Final Project",
-                url: "https://www.youtube.com/embed/oHg5SJYRHA0",
-                description: "Apply what you've learned by working on a final project that showcases your skills and knowledge."
-            }
-        ];
+        };
 
+        const category = {
+            id: "CAT123", // Unique category ID
+            name: "Programming", // Name of the category
+            description: "Courses related to programming and software development.", // Description of the category
+            courses: ["C101", "C102"], // Array of course IDs belonging to this category
+        };
+
+        const course = {
+            id: "C101", // Unique course ID
+            title: "JavaScript Basics", // Title of the course
+            image: "https://example.com/js-basics.jpg", // URL to the course image
+            category: "Programming", // Category ID or name
+            instructor: "Jane Smith", // Name of the instructor
+            description: "Learn the basics of JavaScript programming.", // Course description
+            price: 49.99, // Price of the course (or 'Free' if applicable)
+            duration: "4 Weeks", // Duration of the course
+            content: [
+                {
+                    type: "video", // Type of content (e.g., video, pdf, quiz)
+                    title: "Introduction to JavaScript",
+                    url: "https://www.youtube.com/embed/dQw4w9WgXcQ", // URL to the content
+                },
+                {
+                    type: "video",
+                    title: "Understanding Basic Tools",
+                    url: "https://www.youtube.com/embed/3JZ_D3ELwOQ",
+                },
+                {
+                    type: "video",
+                    title: "Advanced Techniques",
+                    url: "https://www.youtube.com/embed/LXb3EKWsInQ",
+                },
+                {
+                    type: "video",
+                    title: "Final Project",
+                    url: "https://www.youtube.com/embed/oHg5SJYRHA0",
+                },
+            ],
+            studentsEnrolled: ["U12345", "U67890"], // Array of user IDs enrolled in the course
+            ratings: [
+                {
+                    userId: "U12345", // User ID of the reviewer
+                    rating: 4.5, // Rating out of 5
+                    review: "Great course for beginners!", // Review text
+                },
+            ],
+        };
+
+        const watchedVideos = new Array( course.content.length ).fill( false );
         let currentVideo = 0;
 
         function loadVideo ( index ) {
             currentVideo = index;
-            document.getElementById( "course-video" ).src = videos[currentVideo].url;
-            document.getElementById( "course-title" ).innerText = videos[currentVideo].title;
-            document.getElementById( "course-description" ).innerText = videos[currentVideo].description;
+            const video = course.content[currentVideo];
+            document.getElementById( "course-video" ).src = video.url;
+            document.getElementById( "course-title" ).innerText = video.title;
+            document.getElementById( "course-description" ).innerText = course.description;
+
+            watchedVideos[currentVideo] = true;
+
+            document.querySelectorAll( ".course-item" ).forEach( ( item, i ) => {
+                item.classList.remove( "current", "completed" );
+                if ( i === currentVideo ) {
+                    item.classList.add( "current" );
+                } else if ( watchedVideos[i] ) {
+                    item.classList.add( "completed" );
+                }
+            } );
+
+            updateProgressBar();
+
+            const prevButton = document.getElementById( "prev-button" );
+            const nextButton = document.getElementById( "next-button" );
+            const certificateButton = document.getElementById( "certificate-button" );
+
+            prevButton.disabled = currentVideo === 0;
+            if ( currentVideo === course.content.length - 1 ) {
+                nextButton.style.display = "none";
+                certificateButton.style.display = "inline-block";
+            } else {
+                nextButton.style.display = "inline-block";
+                certificateButton.style.display = "none";
+            }
+        }
+
+        function updateProgressBar () {
+            const progressBar = document.getElementById( "progress-bar" );
+            const progressText = document.getElementById( "progress-text" );
+            const watchedCount = watchedVideos.filter( v => v ).length;
+            const progressPercentage = ( watchedCount / course.content.length ) * 100;
+
+            progressBar.style.width = `${progressPercentage}%`;
+            progressText.innerText = `Progress: ${watchedCount}/${course.content.length} videos completed`;
         }
 
         function nextVideo () {
-            if ( currentVideo < videos.length - 1 ) {
+            if ( currentVideo < course.content.length - 1 ) {
                 currentVideo++;
                 loadVideo( currentVideo );
             }
@@ -221,6 +346,22 @@
                 loadVideo( currentVideo );
             }
         }
+
+        function redirectToCertificate () {
+            window.location.href = "certificate.html";
+        }
+
+        function showLessons () {
+            const courseContent = document.getElementById( "course-content" );
+            courseContent.innerHTML = course.content.map( ( lesson, index ) => `
+                <div class="course-item" onclick="loadVideo(${index})">${lesson.title}</div>
+            `).join( '' );
+        }
+
+        document.addEventListener( "DOMContentLoaded", () => {
+            showLessons();
+            loadVideo( currentVideo );
+        } );
     </script>
 
 </body>
