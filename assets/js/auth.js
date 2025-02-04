@@ -59,6 +59,9 @@ const loginUserWithFirebase = async (email, password) => {
     }
 
     console.log("User data fetched successfully:", userData);
+    // Save user data to local storage using the Storage object
+    Storage.saveLocalData("userData", userData);
+
     return userData;
   } catch (error) {
     console.error("Error during login: ", error);

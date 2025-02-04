@@ -287,3 +287,137 @@ function manageSpecific(data, id, value, action, saveCallback) {
       );
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/**
+ * Storage Object
+ * 
+ * The `Storage` object provides a simple interface for managing data in 
+ * LocalStorage, Session Storage, and Cookies. It allows you to perform 
+ * CRUD (Create, Read, Update, Delete) operations on data stored in 
+ * these storage mechanisms. Each storage type has its own set of methods 
+ * for fetching, saving, removing, and managing specific objects within 
+ * arrays.
+ * 
+ * Usage:
+ * 
+ * 1. **LocalStorage Operations**
+ * 
+ * - **Fetch Data**: Retrieve data from LocalStorage.
+ *   ```javascript
+ *   const data = Storage.fetchLocalData('yourKey');
+ *   ```
+ * 
+ * - **Save Data**: Save data to LocalStorage.
+ *   ```javascript
+ *   Storage.saveLocalData('yourKey', yourData);
+ *   ```
+ * 
+ * - **Remove Data**: Remove data from LocalStorage.
+ *   ```javascript
+ *   Storage.removeLocalData('yourKey');
+ *   ```
+ * 
+ * - **Manage Specific Objects**: Perform CRUD operations on specific 
+ *   objects within an array stored in LocalStorage.
+ *   ```javascript
+ *   // Create a new object
+ *   const newObject = Storage.manageLocalSpecific('yourKey', 'uniqueId', { name: 'John' }, 'create');
+ *   
+ *   // Read an object
+ *   const existingObject = Storage.manageLocalSpecific('yourKey', 'uniqueId', null, 'read');
+ *   
+ *   // Update an object
+ *   const updatedObject = Storage.manageLocalSpecific('yourKey', 'uniqueId', { age: 30 }, 'update');
+ *   
+ *   // Delete an object
+ *   const deletedObject = Storage.manageLocalSpecific('yourKey', 'uniqueId', null, 'delete');
+ *   ```
+ * 
+ * 2. **Session Storage Operations**
+ * 
+ * - **Fetch Data**: Retrieve data from Session Storage.
+ *   ```javascript
+ *   const sessionData = Storage.fetchSessionData('yourKey');
+ *   ```
+ * 
+ * - **Save Data**: Save data to Session Storage.
+ *   ```javascript
+ *   Storage.saveSessionData('yourKey', yourData);
+ *   ```
+ * 
+ * - **Remove Data**: Remove data from Session Storage.
+ *   ```javascript
+ *   Storage.removeSessionData('yourKey');
+ *   ```
+ * 
+ * - **Manage Specific Objects**: Perform CRUD operations on specific 
+ *   objects within an array stored in Session Storage.
+ *   ```javascript
+ *   // Similar usage as LocalStorage
+ *   ```
+ * 
+ * 3. **Cookie Operations**
+ * 
+ * - **Fetch Data**: Retrieve data from Cookies.
+ *   ```javascript
+ *   const cookieData = Storage.fetchCookieData('yourKey');
+ *   ```
+ * 
+ * - **Save Data**: Save data to Cookies with an optional expiration time.
+ *   ```javascript
+ *   Storage.saveCookieData('yourKey', yourData, 7); // Expires in 7 days
+ *   ```
+ * 
+ * - **Remove Data**: Remove data from Cookies.
+ *   ```javascript
+ *   Storage.removeCookieData('yourKey');
+ *   ```
+ * 
+ * - **Manage Specific Objects**: Perform CRUD operations on specific 
+ *   objects within an array stored in Cookies.
+ *   ```javascript
+ *   // Similar usage as LocalStorage
+ *   ```
+ * 
+ * Error Handling:
+ * 
+ * - If an invalid action is specified in the `manageLocalSpecific`, 
+ *   `manageSessionSpecific`, or `manageCookieSpecific` methods, an 
+ *   error will be thrown. Valid actions are "read", "update", "delete", 
+ *   and "create".
+ * 
+ * Note:
+ * 
+ * - The data is stored as JSON strings in LocalStorage, Session Storage, 
+ *   and Cookies. Ensure that the data you save can be serialized to JSON.
+ * - The `id` parameter in the management functions should be unique for 
+ *   each object to ensure proper identification.
+ */
