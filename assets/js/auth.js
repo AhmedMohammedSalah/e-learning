@@ -25,16 +25,18 @@ const clearError = (elementId) => {
 // Firebase Functions
 const registerUserWithFirebase = async (email, password, userDetails) => {
   try {
-    const userCredential = await auth.createUserWithEmailAndPassword(
-      email,
-      password
-    );
+    // Create user with email and password
+    const userCredential = await auth.createUserWithEmailAndPassword(email, password);
     const user = userCredential.user;
 
+    // Add user ID to user details
+    userDetails.uid = user.uid;  // Store the Firebase user ID
+
+    // Save user details to Firebase database
     const databaseRef = database.ref("users/" + user.uid);
     await databaseRef.set(userDetails);
 
-    console.log("User registered and data saved successfully!");
+    console.log("User registered and data saved successfully with ID:", user.uid);
     return user;
   } catch (error) {
     console.error("Error during registration: ", error);
@@ -59,9 +61,6 @@ const loginUserWithFirebase = async (email, password) => {
     }
 
     console.log("User data fetched successfully:", userData);
-    // Save user data to local storage using the Storage object
-    Storage.saveLocalData("userData", userData);
-
     return userData;
   } catch (error) {
     console.error("Error during login: ", error);
@@ -150,3 +149,17 @@ const loginForm = document.getElementById("login-form");
 if (loginForm) {
   loginForm.addEventListener("submit", handleLogin);
 }
+
+// Function to Assign User to Course (Based on User ID)
+const assignUserToCourse = async (userId, courseId) => {
+  try {
+    const courseRef = database.ref("courses/" + courseId + "/users");
+    await courseRef.push({
+      userId: userId,
+      timestamp: Date.now(),
+    });
+    console.log(`User with ID ${userId} successfully assigned to course ${courseId}`);
+  } catch (error) {
+    console.error("Error assigning user to course: ", error);
+  }
+};
