@@ -1,340 +1,371 @@
-// دالة لفتح النماذج
-function openForm(formId) {
-  document.getElementById(formId).style.display = "block";
-}
 
-// دالة لإغلاق النماذج
-function closeForm(formId) {
-  document.getElementById(formId).style.display = "none";
-}
-
-// دالة لفتح نموذج إضافة درس
-function openAddLessonForm() {
-  const courseSelect = document.getElementById("lesson-course");
-  courseSelect.innerHTML = ""; // مسح الخيارات القديمة
-
-  const coursesRef = database.ref("courses");
-  coursesRef.once("value", (snapshot) => {
-    const courses = snapshot.val();
-    if (courses) {
-      Object.keys(courses).forEach((key) => {
-        const option = document.createElement("option");
-        option.value = key;
-        option.textContent = courses[key].title;
-        courseSelect.appendChild(option);
-      });
-    }
-  });
-
-  openForm("addLessonForm");
-}
-
-// دالة لإضافة درس جديد
-function addLesson() {
-  const courseId = document.getElementById("lesson-course").value;
-  const title = document.getElementById("lesson-title").value;
-  const videoUrl = document.getElementById("lesson-video-url").value;
-  const description = document.getElementById("lesson-desc").value;
-
-  if (!courseId || !title || !videoUrl || !description) {
-    alert("Please fill all fields!");
-    return;
-  }
-
-  const lesson = {
-    title,
-    videoUrl,
-    description,
-  };
-
-  const lessonsRef = database.ref(`courses/${courseId}/lessons`);
-  lessonsRef
-    .push(lesson)
-    .then(() => {
-      alert("Lesson added successfully!");
-      closeForm("addLessonForm");
-    })
-    .catch((error) => {
-      alert("Error adding lesson: " + error.message);
-    });
-}
-
-// دالة لإضافة كورس جديد
-function addCourse() {
-  const title = document.getElementById("course-title").value;
-  const category = document.getElementById("course-category").value;
-  const instructor = document.getElementById("instructor-name").value;
-  const description = document.getElementById("course-desc").value;
-  const price = document.getElementById("course-price").value;
-  const duration = document.getElementById("course-duration").value;
-
-  if (
-    !title ||
-    !category ||
-    !instructor ||
-    !description ||
-    !price ||
-    !duration
-  ) {
-    alert("Please fill all fields!");
-    return;
-  }
-
-  const coursesRef = database.ref("courses");
-  coursesRef
-    .orderByChild("title")
-    .equalTo(title)
-    .once("value", (snapshot) => {
-      if (snapshot.exists()) {
-        alert("Course with this title already exists!");
-        return;
-      }
-
-      const newCourse = {
-        title,
-        category,
-        instructor,
-        description,
-        price,
-        duration,
-      };
-
-      coursesRef
-        .push(newCourse)
-        .then(() => {
-          alert("Course added successfully!");
-          closeForm("courseForm");
-          fetchCourses(); // تحديث الجدول بعد الإضافة
-        })
-        .catch((error) => {
-          alert("Error adding course: " + error.message);
-        });
-    });
-}
-
-// دالة لجلب الكورسات وعرضها في الجدول
-function fetchCourses() {
+// Fetch all courses
+function fetchCourses(callback) {
   const coursesRef = database.ref("courses");
   coursesRef.on("value", (snapshot) => {
     const courses = snapshot.val();
-    const tbody = document.querySelector("#courses tbody");
-    tbody.innerHTML = ""; // مسح المحتوى القديم
-
-    if (courses) {
-      Object.keys(courses).forEach((key) => {
-        const course = courses[key];
-        const row = `
-                    <tr>
-                        <td>${course.title}</td>
-                        <td>${course.instructor}</td>
-                        <td>${course.category}</td>
-                        <td>${course.price}</td>
-                        <td>${course.duration}</td>
-                        <td>
-                            <button class="edit" onclick="editCourse('${key}')">Edit</button>
-                            <button class="delete" onclick="deleteCourse('${key}')">Delete</button>
-                        </td>
-                    </tr>
-                `;
-        tbody.innerHTML += row;
-      });
-    }
+    callback(courses);
   });
 }
-
-// دالة لتحديث كورس
-function editCourse(courseId) {
+// fetch specific course
+function fetchCourseById(courseId, callback) {
   const courseRef = database.ref(`courses/${courseId}`);
   courseRef.once("value", (snapshot) => {
     const course = snapshot.val();
-    document.getElementById("edit-course-title").value = course.title;
-    document.getElementById("edit-course-category").value = course.category;
-    document.getElementById("edit-instructor-name").value = course.instructor;
-    document.getElementById("edit-course-desc").value = course.description;
-    document.getElementById("edit-course-price").value = course.price;
-    document.getElementById("edit-course-duration").value = course.duration;
-
-    openForm("editCourseForm");
-
-    // حفظ التحديثات
-    document.querySelector("#editCourseForm .submit-btn").onclick = () => {
-      const updatedCourse = {
-        title: document.getElementById("edit-course-title").value,
-        category: document.getElementById("edit-course-category").value,
-        instructor: document.getElementById("edit-instructor-name").value,
-        description: document.getElementById("edit-course-desc").value,
-        price: document.getElementById("edit-course-price").value,
-        duration: document.getElementById("edit-course-duration").value,
-      };
-
-      courseRef
-        .update(updatedCourse)
-        .then(() => {
-          alert("Course updated successfully!");
-          closeForm("editCourseForm");
-          fetchCourses(); // تحديث الجدول بعد التعديل
-        })
-        .catch((error) => {
-          alert("Error updating course: " + error.message);
-        });
-    };
+    callback(course);
   });
 }
 
-// دالة لحذف كورس
-function deleteCourse(courseId) {
-  if (confirm("Are you sure you want to delete this course?")) {
-    const courseRef = database.ref(`courses/${courseId}`);
-    courseRef
-      .remove()
-      .then(() => {
-        alert("Course deleted successfully!");
-        fetchCourses(); // تحديث الجدول بعد الحذف
-      })
-      .catch((error) => {
-        alert("Error deleting course: " + error.message);
-      });
-  }
-}
-
-// دالة لإضافة فئة جديدة
-function addCategory() {
-  const categoryName = document.getElementById("category-name").value;
-
-  if (!categoryName) {
-    alert("Please enter a category name!");
-    return;
-  }
-
-  const categoriesRef = database.ref("categories");
-  categoriesRef
-    .push({ name: categoryName })
-    .then(() => {
-      alert("Category added successfully!");
-      closeForm("categoryForm");
-      fetchCategories(); // تحديث الجدول بعد الإضافة
-    })
-    .catch((error) => {
-      alert("Error adding category: " + error.message);
+// Add a new course
+function addCourse(courseData, onSuccess, onError) {
+  const coursesRef = database.ref("courses");
+  coursesRef
+    .orderByChild("title")
+    .equalTo(courseData.title)
+    .once("value", (snapshot) => {
+      if (snapshot.exists()) {
+        onError("Course with this title already exists!");
+      } else {
+        coursesRef
+          .push(courseData)
+          .then(() => onSuccess())
+          .catch((error) => onError(error.message));
+      }
     });
 }
 
-// دالة لجلب الفئات وعرضها في الجدول
-function fetchCategories() {
+// Update a course
+function updateCourse(courseId, updatedData, onSuccess, onError) {
+  const courseRef = database.ref(`courses/${courseId}`);
+  courseRef
+    .update(updatedData)
+    .then(() => onSuccess())
+    .catch((error) => onError(error.message));
+}
+
+// Delete a course
+function deleteCourse(courseId, onSuccess, onError) {
+  const courseRef = database.ref(`courses/${courseId}`);
+  courseRef
+    .remove()
+    .then(() => onSuccess())
+    .catch((error) => onError(error.message));
+}
+
+// Fetch all categories
+function fetchCategories(callback) {
   const categoriesRef = database.ref("categories");
   categoriesRef.on("value", (snapshot) => {
     const categories = snapshot.val();
-    const categorySelect = document.getElementById("course-category");
-    const tbody = document.querySelector("#categories tbody");
-    tbody.innerHTML = ""; // مسح المحتوى القديم
-
-    // مسح الخيارات القديمة
-    categorySelect.innerHTML = "";
-
-    if (categories) {
-      Object.keys(categories).forEach((key) => {
-        const category = categories[key];
-        // إضافة الفئات إلى الـ select
-        const option = document.createElement("option");
-        option.value = category.name;
-        option.textContent = category.name;
-        categorySelect.appendChild(option);
-
-        // إضافة الفئات إلى الجدول
-        const row = `
-                    <tr>
-                        <td>${category.name}</td>
-                        <td>
-                            <button class="edit" onclick="editCategory('${key}')">Edit</button>
-                            <button class="delete" onclick="deleteCategory('${key}')">Delete</button>
-                        </td>
-                    </tr>
-                `;
-        tbody.innerHTML += row;
-      });
-    }
+    callback(categories);
   });
 }
 
-// دالة لتحديث فئة
-function editCategory(categoryId) {
+// Add a new category
+function addCategory(categoryData, onSuccess, onError) {
+  const categoriesRef = database.ref("categories");
+  categoriesRef
+    .push(categoryData)
+    .then(() => onSuccess())
+    .catch((error) => onError(error.message));
+}
+
+// Update a category
+function updateCategory(categoryId, updatedData, onSuccess, onError) {
   const categoryRef = database.ref(`categories/${categoryId}`);
-  categoryRef.once("value", (snapshot) => {
-    const category = snapshot.val();
-    document.getElementById("edit-category-name").value = category.name;
-
-    openForm("editCategoryForm");
-
-    // حفظ التحديثات
-    document.querySelector("#editCategoryForm .submit-btn").onclick = () => {
-      const updatedCategory = {
-        name: document.getElementById("edit-category-name").value,
-      };
-
-      categoryRef
-        .update(updatedCategory)
-        .then(() => {
-          // تحديث الكورسات المرتبطة بهذه الفئة
-          const coursesRef = database.ref("courses");
-          coursesRef.once("value", (snapshot) => {
-            const courses = snapshot.val();
-            if (courses) {
-              Object.keys(courses).forEach((key) => {
-                if (courses[key].category === category.name) {
-                  coursesRef
-                    .child(key)
-                    .update({ category: updatedCategory.name });
-                }
-              });
-            }
-          });
-
-          alert("Category updated successfully!");
-          closeForm("editCategoryForm");
-          fetchCategories(); // تحديث الجدول بعد التعديل
-        })
-        .catch((error) => {
-          alert("Error updating category: " + error.message);
-        });
-    };
-  });
+  categoryRef
+    .update(updatedData)
+    .then(() => onSuccess())
+    .catch((error) => onError(error.message));
 }
 
-// دالة لحذف فئة
-function deleteCategory(categoryId) {
-  if (confirm("Are you sure you want to delete this category?")) {
-    const categoryRef = database.ref(`categories/${categoryId}`);
-    categoryRef.once("value", (snapshot) => {
-      const category = snapshot.val();
+// Delete a category
+function deleteCategory(categoryId, onSuccess, onError) {
+  const categoryRef = database.ref(`categories/${categoryId}`);
+  categoryRef
+    .remove()
+    .then(() => onSuccess())
+    .catch((error) => onError(error.message));
+}
 
-      // حذف الكورسات المرتبطة بهذه الفئة
-      const coursesRef = database.ref("courses");
-      coursesRef.once("value", (snapshot) => {
-        const courses = snapshot.val();
-        if (courses) {
-          Object.keys(courses).forEach((key) => {
-            if (courses[key].category === category.name) {
-              coursesRef.child(key).remove();
-            }
-          });
+// Add a new lesson
+function addLesson(courseId, lessonData, onSuccess, onError) {
+  const lessonsRef = database.ref(`courses/${courseId}/lessons`);
+  lessonsRef
+    .push(lessonData)
+    .then(() => onSuccess())
+    .catch((error) => onError(error.message));
+}
+
+function enrollStudent(studentId, courseId) {
+  const studentCourseRef = firebase
+    .database()
+    .ref(`students-courses/${studentId}_${courseId}`);
+
+  studentCourseRef
+    .set({
+      student_id: studentId,
+      course_id: courseId,
+      status: "pending",
+      progress: 0,
+    })
+    .then(() => {
+      console.log(
+        `Student ${studentId} requested to enroll in course ${courseId}`
+      );
+    })
+    .catch((error) => {
+      console.error("Error enrolling student:", error);
+    });
+}
+function approveEnrollment(studentId, courseId) {
+  const studentCourseRef = firebase
+    .database()
+    .ref(`students-courses/${studentId}_${courseId}`);
+
+  studentCourseRef
+    .update({
+      status: "enrolled",
+      progress: 0,
+    })
+    .then(() => {
+      console.log(
+        `Student ${studentId} has been enrolled in course ${courseId}`
+      );
+    })
+    .catch((error) => {
+      console.error("Error approving enrollment:", error);
+    });
+}
+function updateProgress(studentId, courseId, completedLessons, totalLessons) {
+  if (totalLessons === 0) {
+    console.error("Total lessons cannot be zero.");
+    return;
+  }
+
+  const progress = Math.round((completedLessons / totalLessons) * 100);
+
+  const studentCourseRef = firebase
+    .database()
+    .ref(`students-courses/${studentId}_${courseId}`);
+
+  studentCourseRef
+    .update({
+      progress: progress,
+    })
+    .then(() => {
+      console.log(
+        `Progress updated to ${progress}% for student ${studentId} in course ${courseId}`
+      );
+    })
+    .catch((error) => {
+      console.error("Error updating progress:", error);
+    });
+}
+function getStudentCourseStatus(studentId, courseId) {
+  const studentCourseRef = firebase
+    .database()
+    .ref(`students-courses/${studentId}_${courseId}`);
+
+  studentCourseRef
+    .once("value", (snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        console.log(
+          `Student ${studentId} is ${data.status} in course ${courseId}, progress: ${data.progress}%`
+        );
+      } else {
+        console.log(
+          `Student ${studentId} is not enrolled in course ${courseId}`
+        );
+      }
+    })
+    .catch((error) => {
+      console.error("Error fetching student course status:", error);
+    });
+}
+function myCourses(studentId, callback) {
+  const coursesRef = firebase.database().ref("students-courses");
+
+  coursesRef
+    .once("value", (snapshot) => {
+      if (!snapshot.exists()) {
+        console.log("No courses found.");
+        callback([]);
+        return;
+      }
+
+      const enrolledCourses = [];
+      const studentCourses = snapshot.val();
+
+      for (let key in studentCourses) {
+        const course = studentCourses[key];
+        if (course.student_id === studentId && course.status === "enrolled") {
+          enrolledCourses.push(course.course_id);
+        }
+      }
+
+      if (enrolledCourses.length === 0) {
+        console.log("No enrolled courses found for student:", studentId);
+        callback([]);
+        return;
+      }
+
+      const allCoursesRef = firebase.database().ref("courses");
+      allCoursesRef.once("value", (courseSnapshot) => {
+        if (!courseSnapshot.exists()) {
+          console.log("No course details found.");
+          callback([]);
+          return;
+        }
+
+        const allCourses = courseSnapshot.val();
+        const studentCoursesDetails = enrolledCourses
+          .map((courseId) => allCourses[courseId])
+          .filter((course) => course);
+
+        callback(studentCoursesDetails);
+      });
+    })
+    .catch((error) => {
+      console.error("Error fetching myCourses:", error);
+      callback([]);
+    });
+}
+function myCourses(studentId, callback) {
+  const coursesRef = firebase.database().ref("students-courses");
+
+  coursesRef
+    .once("value", (snapshot) => {
+      if (!snapshot.exists()) {
+        console.log("No courses found.");
+        callback([]);
+        return;
+      }
+
+      const enrolledCourses = [];
+      const studentCourses = snapshot.val();
+
+      for (let key in studentCourses) {
+        const course = studentCourses[key];
+        if (course.student_id === studentId && course.status === "enrolled") {
+          enrolledCourses.push(course.course_id);
+        }
+      }
+
+      if (enrolledCourses.length === 0) {
+        console.log("No enrolled courses found for student:", studentId);
+        callback([]);
+        return;
+      }
+
+      const allCoursesRef = firebase.database().ref("courses");
+      allCoursesRef.once("value", (courseSnapshot) => {
+        if (!courseSnapshot.exists()) {
+          console.log("No course details found.");
+          callback([]);
+          return;
+        }
+
+        const allCourses = courseSnapshot.val();
+        const studentCoursesDetails = enrolledCourses
+          .map((courseId) => allCourses[courseId])
+          .filter((course) => course);
+
+        callback(studentCoursesDetails);
+      });
+    })
+    .catch((error) => {
+      console.error("Error fetching myCourses:", error);
+      callback([]);
+    });
+}
+function filterByCategory(category, callback) {
+  const coursesRef = firebase.database().ref("courses");
+
+  coursesRef
+    .once("value", (snapshot) => {
+      if (!snapshot.exists()) {
+        console.log("No courses found.");
+        callback([]);
+        return;
+      }
+
+      const filteredCourses = [];
+      snapshot.forEach((childSnapshot) => {
+        const course = childSnapshot.val();
+        if (course.category === category) {
+          filteredCourses.push(course);
         }
       });
 
-      categoryRef
-        .remove()
-        .then(() => {
-          alert("Category deleted successfully!");
-          fetchCategories(); // تحديث الجدول بعد الحذف
-        })
-        .catch((error) => {
-          alert("Error deleting category: " + error.message);
-        });
+      callback(filteredCourses);
+    })
+    .catch((error) => {
+      console.error("Error filtering courses by category:", error);
+      callback([]);
     });
+}
+function filterByWord(word, callback) {
+  const coursesRef = firebase.database().ref("courses");
+
+  coursesRef
+    .once("value", (snapshot) => {
+      if (!snapshot.exists()) {
+        console.log("No courses found.");
+        callback([]);
+        return;
+      }
+
+      const filteredCourses = [];
+      snapshot.forEach((childSnapshot) => {
+        const course = childSnapshot.val();
+        if (
+          course.title.toLowerCase().includes(word.toLowerCase()) ||
+          course.description.toLowerCase().includes(word.toLowerCase())
+        ) {
+          filteredCourses.push(course);
+        }
+      });
+
+      callback(filteredCourses);
+    })
+    .catch((error) => {
+      console.error("Error filtering courses by word:", error);
+      callback([]);
+    });
+}
+function currentCourse(courseId, callback) {
+  const courseRef = firebase.database().ref("courses").child(courseId);
+
+  courseRef
+    .once("value", (snapshot) => {
+      if (snapshot.exists()) {
+        callback({ id: snapshot.key, ...snapshot.val() });
+      } else {
+        callback(null);
+      }
+    })
+    .catch((error) => {
+      console.error("Error fetching course:", error);
+      callback(null);
+    });
+}
+function addToWishlist(courseId) {
+  if (!courseId) {
+    console.error("Invalid course ID!");
+    return;
   }
+
+  fetchCourseById(courseId, (course) => {
+    if (!course) {
+      console.error("Course not found!");
+      return;
+    }
+    // Storage.saveLocalData("wishlist",{});
+    Storage.manageLocalSpecific("wishlist", courseId, course, "create");
+    console.log(`Course "${course.title}" added to wishlist.`);
+  });
 }
 
-// تحميل البيانات عند فتح الصفحة
-document.addEventListener("DOMContentLoaded", () => {
-  fetchCourses();
-  fetchCategories();
-});
+
