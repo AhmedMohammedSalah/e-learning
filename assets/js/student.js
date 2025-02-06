@@ -10,92 +10,74 @@ document.addEventListener("DOMContentLoaded", function () {
   document.getElementById("student-name").innerHTML = studentName;
   console.log(studentId);
 
-  // ✅ تحميل الدورات الخاصة بالطالب
   function loadMyCourses() {
     myCourses(studentId, (courses) => {
-      const container = document.querySelector(
-        "#my-courses .courses-container"
+      renderCourses("#my-courses .courses-container", courses, true);
+    });
+  }
+
+  async function loadAllCourses() {
+    try {
+      const allCourses = await fetchCoursesAsync();
+      const enrolledCourses = await myCoursesAsync(studentId);
+      const wishlist = await fetchWishlistAsync();
+      console.log(allCourses);
+      console.log(enrolledCourses);
+      console.log(wishlist);
+
+      const courseArray = Object.entries(allCourses || {}).map(
+        ([id, course]) => ({
+          ...course,
+          id,
+          isEnrolled: enrolledCourses.some(
+            (enrolled) => enrolled.course_id === id
+          ),
+          isInWishlist: wishlist.some(
+            (wishlistCourse) => wishlistCourse.id === id
+          ),
+        })
       );
-      container.innerHTML = "";
-      if (courses.length === 0) {
-        container.innerHTML = "<p>No enrolled courses.</p>";
-        return;
-      }
-      courses.forEach((course) => {
-        const courseCard = `
-                <div class="course-card">
-                    <img src="${
-                      course.image || "../images/fakeimg.png"
-                    }" class="course-image">
-                    <h3>${course.title}</h3>
-                    <p>Instructor: ${course.instructor || "Unknown"}</p>
-                    <p>Category: ${course.category || "General"}</p>
-                    <p>Duration: ${course.duration || "N/A"} hours</p>
-                    <button class="continue-btn" data-id="${
-                      course.id
-                    }">Continue Course</button>
-                    <button class="viewcourse-btn" data-id="${
-                      course.id
-                    }">View Course</button>
-                </div>`;
-        container.innerHTML += courseCard;
-      });
 
-      addEventListenersToButtons();
-    });
+      renderCourses("#all-courses .courses-container", courseArray);
+    } catch (error) {
+      console.error("Error loading courses:", error);
+    }
   }
 
-  // ✅ تحميل جميع الدورات
-  function loadAllCourses() {
-    fetchCourses((allCourses) => {
-      myCourses(studentId, (enrolledCourses) => {
-        const container = document.querySelector(
-          "#all-courses .courses-container"
-        );
-        container.innerHTML = "";
-        if (!allCourses) {
-          container.innerHTML = "<p>No courses available.</p>";
-          return;
+  function fetchCoursesAsync() {
+    return new Promise((resolve, reject) => {
+      fetchCourses((courses) => {
+        if (courses) {
+          resolve(courses);
+        } else {
+          reject("No courses found");
         }
-
-        Object.entries(allCourses).forEach(([id, course]) => {
-          const isEnrolled = enrolledCourses.some(
-            (enrolledCourse) => enrolledCourse.id === id
-          );
-
-          const courseCard = `
-                    <div class="course-card">
-                        <img src="${
-                          course.image || "../images/fakeimg.png"
-                        }" class="course-image">
-                        <h3>${course.title}</h3>
-                        <p>Instructor: ${course.instructor || "Unknown"}</p>
-                        <p>Category: ${course.category || "General"}</p>
-                        <p>Duration: ${course.duration || "N/A"} hours</p>
-                        ${
-                          isEnrolled
-                            ? `<button class="continue-btn" data-id="${id}">Continue Course</button>`
-                            : `<button class="enroll-btn" data-id="${id}">Enroll Now</button>`
-                        }
-                        <button class="viewcourse-btn" data-id="${id}">View Course</button>
-                        <button class="wishlist-btn" data-id="${id}">Add to Wishlist</button>
-                    </div>`;
-          container.innerHTML += courseCard;
-        });
-
-        addEventListenersToButtons();
       });
     });
   }
 
-  // ✅ تحميل الفئات في الفلتر
+  function myCoursesAsync(studentId) {
+    return new Promise((resolve, reject) => {
+      myCourses(studentId, (enrolledCourses) => {
+        resolve(enrolledCourses);
+      });
+    });
+  }
+
+  function fetchWishlistAsync() {
+    return new Promise((resolve) => {
+      fetchWishlist((wishlist) => {
+        resolve(wishlist);
+      });
+    });
+  }
+
   function loadCategories() {
     fetchCategories((categories) => {
       const select = document.getElementById("filter-category");
       select.innerHTML = '<option value="">All Categories</option>';
-      if (!categories) return;
 
-      Object.values(categories).forEach((category) => {
+      Object.values(categories || {}).forEach((category) => {
         const option = document.createElement("option");
         option.value = category.name;
         option.textContent = category.name;
@@ -104,107 +86,173 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // ✅ البحث والتصفية حسب الفئة
-  document
-    .getElementById("search-courses")
-    .addEventListener("input", function () {
-      const searchTerm = this.value.trim();
-      filterByWord(searchTerm, updateCoursesContainer);
+  function loadWishlist() {
+    fetchWishlist((wishlist) => {
+      renderCourses("#wishlist-container", wishlist);
     });
+  }
 
-  document
-    .getElementById("filter-category")
-    .addEventListener("change", function () {
-      const category = this.value;
-      if (category) {
-        filterByCategory(category, updateCoursesContainer);
-      } else {
-        loadAllCourses(); // Reload all courses when no category is selected
-      }
-    });
-
-  // ✅ تحديث عرض الدورات بعد البحث أو الفلترة
-  function updateCoursesContainer(courses) {
-    const container = document.querySelector("#all-courses .courses-container");
+  function renderCourses(containerSelector, courses, isMyCourses = false) {
+    const container = document.querySelector(containerSelector);
+    if (!container) {
+      console.error(
+        `Container with selector '${containerSelector}' not found.`
+      );
+      return;
+    }
     container.innerHTML = "";
-    if (courses.length === 0) {
-      container.innerHTML = "<p>No matching courses found.</p>";
+
+    if (!courses || courses.length === 0) {
+      container.innerHTML = "<p>No courses found.</p>";
       return;
     }
 
-    myCourses(studentId, (enrolledCourses) => {
-      courses.forEach((course) => {
-        const isEnrolled = enrolledCourses.some(
-          (enrolledCourse) => enrolledCourse.id === course.id
-        );
+    const defaultImage = "./assets/images/fakeimg.png";
 
+    function getImageSrc(image) {
+      return image ? image : defaultImage;
+    }
+    if (containerSelector == "#wishlist-container") {
+      courses.forEach((course) => {
         const courseCard = `
-                    <div class="course-card">
-                        <img src="${
-                          course.image || "../images/fakeimg.png"
-                        }" class="course-image">
-                        <h3>${course.title}</h3>
-                        <p>Instructor: ${course.instructor || "Unknown"}</p>
-                        <p>Category: ${course.category || "General"}</p>
-                        <p>Duration: ${course.duration || "N/A"} hours</p>
-                        ${
-                          isEnrolled
-                            ? `<button class="continue-btn" data-id="${course.id}">Continue Course</button>`
-                            : `<button class="enroll-btn" data-id="${course.id}">Enroll Now</button>`
-                        }
-                        <button class="viewcourse-btn" data-id="${
-                          course.id
-                        }">View Course</button>
-                        <button class="wishlist-btn" data-id="${
-                          course.id
-                        }">Add to Wishlist</button>
-                    </div>`;
+      <div class="course-card">
+        <img src="${getImageSrc(course.image)}" class="course-image">
+        <h3>${course.title}</h3>
+        <p>Instructor: ${course.instructor || "Unknown"}</p>
+        <p>Category: ${course.category || "General"}</p>
+        <p>Duration: ${course.duration || "N/A"} hours</p>
+        <p>Price: ${course.price || "N/A"} LE</p>
+        ${
+          isMyCourses || course.isEnrolled
+            ? `<button class="continue-btn" data-id="${course.id}">Continue Course</button>`
+            : `
+              <button class="enroll-btn" data-id="${course.id}">Enroll Now</button>
+              <button class="viewcourse-btn" data-id="${course.id}">View Course</button>
+            <button class="remove-wishlist-btn" data-id="${course.id}">Remove from Wishlist</button>
+            `
+        }
+      </div>`;
         container.innerHTML += courseCard;
       });
 
       addEventListenersToButtons();
+      return;
+    }
+    courses.forEach((course) => {
+      const courseCard = `
+      <div class="course-card">
+        <img src="${getImageSrc(course.image)}" class="course-image">
+        <h3>${course.title}</h3>
+        <p>Instructor: ${course.instructor || "Unknown"}</p>
+        <p>Category: ${course.category || "General"}</p>
+        <p>Duration: ${course.duration || "N/A"} hours</p>
+        <p>Price: ${course.price || "N/A"} LE</p>
+        ${
+          isMyCourses || course.isEnrolled
+            ? `<button class="continue-btn" data-id="${course.id}">Continue Course</button>`
+            : `
+              <button class="enroll-btn" data-id="${
+                course.id
+              }">Enroll Now</button>
+              <button class="viewcourse-btn" data-id="${
+                course.id
+              }">View Course</button>
+              ${
+                course.isInWishlist
+                  ? `<button class="remove-wishlist-btn" data-id="${course.id}">Remove from Wishlist</button>`
+                  : `<button class="wishlist-btn" data-id="${course.id}">Add to Wishlist</button>`
+              }
+            `
+        }
+      </div>`;
+      container.innerHTML += courseCard;
+    });
+
+    addEventListenersToButtons();
+  }
+
+  function handleSearch() {
+    const searchTerm = this.value.trim();
+    filterByWord(searchTerm, updateCoursesContainer);
+  }
+
+  function handleCategoryFilter() {
+    const category = this.value;
+    category
+      ? filterByCategory(category, updateCoursesContainer)
+      : loadAllCourses();
+  }
+
+  function updateCoursesContainer(filteredCourses) {
+    myCourses(studentId, (enrolledCourses) => {
+      fetchWishlist((wishlist) => {
+        const courses = filteredCourses.map((course) => ({
+          ...course,
+          isEnrolled: enrolledCourses.some(
+            (enrolled) => enrolled.id === course.id
+          ),
+          isInWishlist: wishlist.some(
+            (wishlistCourse) => wishlistCourse.id === course.id
+          ),
+        }));
+
+        renderCourses("#all-courses .courses-container", courses);
+      });
     });
   }
 
-  // ✅ وظيفة لإضافة الأحداث للأزرار بعد تحميل الدورات
   function addEventListenersToButtons() {
-    // زر التسجيل في الدورة
-    document.querySelectorAll(".enroll-btn").forEach((btn) => {
+    document.querySelectorAll(".enroll-btn").forEach((btn) =>
       btn.addEventListener("click", function () {
-        const courseId = this.getAttribute("data-id");
-        enrollStudent(studentId, courseId);
+        enrollStudent(studentId, this.dataset.id);
         alert("Enrollment request sent!");
-      });
-    });
+        loadAllCourses();
+      })
+    );
 
-    // زر إضافة إلى قائمة الأمنيات
-    document.querySelectorAll(".wishlist-btn").forEach((btn) => {
+    document.querySelectorAll(".wishlist-btn").forEach((btn) =>
       btn.addEventListener("click", function () {
-        const courseId = this.getAttribute("data-id");
-        console.log(courseId);
-        addToWishlist(courseId);
-      });
-    });
+        addToWishlist(this.dataset.id);
+        loadAllCourses();
+        loadWishlist();
+      })
+    );
 
-    // زر عرض الدورة
-    document.querySelectorAll(".viewcourse-btn").forEach((btn) => {
+    document.querySelectorAll(".remove-wishlist-btn").forEach((btn) =>
       btn.addEventListener("click", function () {
-        const courseId = this.getAttribute("data-id");
-        window.location.href = `course-details.html?id=${courseId}`;
-      });
-    });
+        removeFromWishlist(this.dataset.id);
+        loadAllCourses();
+        loadWishlist();
+      })
+    );
 
-    // زر متابعة الدورة
-    document.querySelectorAll(".continue-btn").forEach((btn) => {
+    document.querySelectorAll(".viewcourse-btn").forEach((btn) =>
       btn.addEventListener("click", function () {
-        const courseId = this.getAttribute("data-id");
-        window.location.href = `course-details.html?id=${courseId}`;
-      });
-    });
+        window.location.href = `course.html?id=${this.dataset.id}`;
+      })
+    );
+
+    document.querySelectorAll(".continue-btn").forEach((btn) =>
+      btn.addEventListener("click", function () {
+        window.location.href = `lesson.html?id=${this.dataset.id}`;
+      })
+    );
   }
+  document
+    .getElementById("logout")
+    .addEventListener("click", function () {
+      Storage.removeLocalData("userData");
+      Storage.removeLocalData("whichlist");
+    });
+  document
+    .getElementById("search-courses")
+    .addEventListener("input", handleSearch);
+  document
+    .getElementById("filter-category")
+    .addEventListener("change", handleCategoryFilter);
 
-  // ✅ تحميل البيانات الأولية
   loadMyCourses();
   loadAllCourses();
   loadCategories();
+  loadWishlist();
 });

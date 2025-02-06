@@ -1,371 +1,449 @@
-
-// Fetch all courses
 function fetchCourses(callback) {
-  const coursesRef = database.ref("courses");
-  coursesRef.on("value", (snapshot) => {
-    const courses = snapshot.val();
-    callback(courses);
-  });
-}
-// fetch specific course
-function fetchCourseById(courseId, callback) {
-  const courseRef = database.ref(`courses/${courseId}`);
-  courseRef.once("value", (snapshot) => {
-    const course = snapshot.val();
-    callback(course);
-  });
-}
-
-// Add a new course
-function addCourse(courseData, onSuccess, onError) {
-  const coursesRef = database.ref("courses");
-  coursesRef
-    .orderByChild("title")
-    .equalTo(courseData.title)
-    .once("value", (snapshot) => {
-      if (snapshot.exists()) {
-        onError("Course with this title already exists!");
-      } else {
-        coursesRef
-          .push(courseData)
-          .then(() => onSuccess())
-          .catch((error) => onError(error.message));
-      }
+  try {
+    const coursesRef = database.ref("courses");
+    coursesRef.on("value", (snapshot) => {
+      const courses = snapshot.val();
+      callback(courses);
     });
+  } catch (error) {
+    console.error("Error fetching courses:", error);
+    throw error;
+  }
 }
 
-// Update a course
+function fetchCourseById(courseId, callback) {
+  try {
+    const courseRef = database.ref(`courses/${courseId}`);
+    courseRef.once("value", (snapshot) => {
+      const course = snapshot.val();
+      callback(course);
+    });
+  } catch (error) {
+    console.error("Error fetching course by ID:", error);
+    throw error;
+  }
+}
+
+function addCourse(courseData, onSuccess, onError) {
+  try {
+    const coursesRef = database.ref("courses");
+    coursesRef
+      .orderByChild("title")
+      .equalTo(courseData.title)
+      .once("value", (snapshot) => {
+        if (snapshot.exists()) {
+          onError("Course with this title already exists!");
+        } else {
+          coursesRef
+            .push(courseData)
+            .then(() => onSuccess())
+            .catch((error) => onError(error.message));
+        }
+      });
+  } catch (error) {
+    console.error("Error adding course:", error);
+    throw error;
+  }
+}
+
 function updateCourse(courseId, updatedData, onSuccess, onError) {
-  const courseRef = database.ref(`courses/${courseId}`);
-  courseRef
-    .update(updatedData)
-    .then(() => onSuccess())
-    .catch((error) => onError(error.message));
+  try {
+    const courseRef = database.ref(`courses/${courseId}`);
+    courseRef
+      .update(updatedData)
+      .then(() => onSuccess())
+      .catch((error) => onError(error.message));
+  } catch (error) {
+    console.error("Error updating course:", error);
+    throw error;
+  }
 }
 
-// Delete a course
 function deleteCourse(courseId, onSuccess, onError) {
-  const courseRef = database.ref(`courses/${courseId}`);
-  courseRef
-    .remove()
-    .then(() => onSuccess())
-    .catch((error) => onError(error.message));
+  try {
+    const courseRef = database.ref(`courses/${courseId}`);
+    courseRef
+      .remove()
+      .then(() => onSuccess())
+      .catch((error) => onError(error.message));
+  } catch (error) {
+    console.error("Error deleting course:", error);
+    throw error;
+  }
 }
 
-// Fetch all categories
 function fetchCategories(callback) {
-  const categoriesRef = database.ref("categories");
-  categoriesRef.on("value", (snapshot) => {
-    const categories = snapshot.val();
-    callback(categories);
-  });
+  try {
+    const categoriesRef = database.ref("categories");
+    categoriesRef.on("value", (snapshot) => {
+      const categories = snapshot.val();
+      callback(categories);
+    });
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+    throw error;
+  }
 }
 
-// Add a new category
 function addCategory(categoryData, onSuccess, onError) {
-  const categoriesRef = database.ref("categories");
-  categoriesRef
-    .push(categoryData)
-    .then(() => onSuccess())
-    .catch((error) => onError(error.message));
+  try {
+    const categoriesRef = database.ref("categories");
+    categoriesRef
+      .push(categoryData)
+      .then(() => onSuccess())
+      .catch((error) => onError(error.message));
+  } catch (error) {
+    console.error("Error adding category:", error);
+    throw error;
+  }
 }
 
-// Update a category
 function updateCategory(categoryId, updatedData, onSuccess, onError) {
-  const categoryRef = database.ref(`categories/${categoryId}`);
-  categoryRef
-    .update(updatedData)
-    .then(() => onSuccess())
-    .catch((error) => onError(error.message));
+  try {
+    const categoryRef = database.ref(`categories/${categoryId}`);
+    categoryRef
+      .update(updatedData)
+      .then(() => onSuccess())
+      .catch((error) => onError(error.message));
+  } catch (error) {
+    console.error("Error updating category:", error);
+    throw error;
+  }
 }
 
-// Delete a category
 function deleteCategory(categoryId, onSuccess, onError) {
-  const categoryRef = database.ref(`categories/${categoryId}`);
-  categoryRef
-    .remove()
-    .then(() => onSuccess())
-    .catch((error) => onError(error.message));
+  try {
+    const categoryRef = database.ref(`categories/${categoryId}`);
+    categoryRef
+      .remove()
+      .then(() => onSuccess())
+      .catch((error) => onError(error.message));
+  } catch (error) {
+    console.error("Error deleting category:", error);
+    throw error;
+  }
 }
 
-// Add a new lesson
 function addLesson(courseId, lessonData, onSuccess, onError) {
-  const lessonsRef = database.ref(`courses/${courseId}/lessons`);
-  lessonsRef
-    .push(lessonData)
-    .then(() => onSuccess())
-    .catch((error) => onError(error.message));
+  try {
+    const lessonsRef = database.ref(`courses/${courseId}/lessons`);
+    lessonsRef
+      .push(lessonData)
+      .then(() => onSuccess())
+      .catch((error) => onError(error.message));
+  } catch (error) {
+    console.error("Error adding lesson:", error);
+    throw error;
+  }
 }
 
 function enrollStudent(studentId, courseId) {
-  const studentCourseRef = firebase
-    .database()
-    .ref(`students-courses/${studentId}_${courseId}`);
-
-  studentCourseRef
-    .set({
-      student_id: studentId,
-      course_id: courseId,
-      status: "pending",
-      progress: 0,
-    })
-    .then(() => {
-      console.log(
-        `Student ${studentId} requested to enroll in course ${courseId}`
-      );
-    })
-    .catch((error) => {
-      console.error("Error enrolling student:", error);
-    });
+  try {
+    const studentCourseRef = database.ref(
+      `students-courses/${studentId}_${courseId}`
+    );
+    studentCourseRef
+      .set({
+        student_id: studentId,
+        course_id: courseId,
+        status: "pending",
+        progress: 0,
+      })
+      .then(() => {
+        console.log(
+          `Student ${studentId} requested to enroll in course ${courseId}`
+        );
+      })
+      .catch((error) => {
+        console.error("Error enrolling student:", error);
+      });
+  } catch (error) {
+    console.error("Error enrolling student:", error);
+    throw error;
+  }
 }
+
 function approveEnrollment(studentId, courseId) {
-  const studentCourseRef = firebase
-    .database()
-    .ref(`students-courses/${studentId}_${courseId}`);
-
-  studentCourseRef
-    .update({
-      status: "enrolled",
-      progress: 0,
-    })
-    .then(() => {
-      console.log(
-        `Student ${studentId} has been enrolled in course ${courseId}`
-      );
-    })
-    .catch((error) => {
-      console.error("Error approving enrollment:", error);
-    });
+  try {
+    const studentCourseRef = database.ref(
+      `students-courses/${studentId}_${courseId}`
+    );
+    studentCourseRef
+      .update({
+        status: "enrolled",
+        progress: 0,
+      })
+      .then(() => {
+        console.log(
+          `Student ${studentId} has been enrolled in course ${courseId}`
+        );
+      })
+      .catch((error) => {
+        console.error("Error approving enrollment:", error);
+      });
+  } catch (error) {
+    console.error("Error approving enrollment:", error);
+    throw error;
+  }
 }
+
 function updateProgress(studentId, courseId, completedLessons, totalLessons) {
-  if (totalLessons === 0) {
-    console.error("Total lessons cannot be zero.");
-    return;
-  }
-
-  const progress = Math.round((completedLessons / totalLessons) * 100);
-
-  const studentCourseRef = firebase
-    .database()
-    .ref(`students-courses/${studentId}_${courseId}`);
-
-  studentCourseRef
-    .update({
-      progress: progress,
-    })
-    .then(() => {
-      console.log(
-        `Progress updated to ${progress}% for student ${studentId} in course ${courseId}`
-      );
-    })
-    .catch((error) => {
-      console.error("Error updating progress:", error);
-    });
-}
-function getStudentCourseStatus(studentId, courseId) {
-  const studentCourseRef = firebase
-    .database()
-    .ref(`students-courses/${studentId}_${courseId}`);
-
-  studentCourseRef
-    .once("value", (snapshot) => {
-      if (snapshot.exists()) {
-        const data = snapshot.val();
-        console.log(
-          `Student ${studentId} is ${data.status} in course ${courseId}, progress: ${data.progress}%`
-        );
-      } else {
-        console.log(
-          `Student ${studentId} is not enrolled in course ${courseId}`
-        );
-      }
-    })
-    .catch((error) => {
-      console.error("Error fetching student course status:", error);
-    });
-}
-function myCourses(studentId, callback) {
-  const coursesRef = firebase.database().ref("students-courses");
-
-  coursesRef
-    .once("value", (snapshot) => {
-      if (!snapshot.exists()) {
-        console.log("No courses found.");
-        callback([]);
-        return;
-      }
-
-      const enrolledCourses = [];
-      const studentCourses = snapshot.val();
-
-      for (let key in studentCourses) {
-        const course = studentCourses[key];
-        if (course.student_id === studentId && course.status === "enrolled") {
-          enrolledCourses.push(course.course_id);
-        }
-      }
-
-      if (enrolledCourses.length === 0) {
-        console.log("No enrolled courses found for student:", studentId);
-        callback([]);
-        return;
-      }
-
-      const allCoursesRef = firebase.database().ref("courses");
-      allCoursesRef.once("value", (courseSnapshot) => {
-        if (!courseSnapshot.exists()) {
-          console.log("No course details found.");
-          callback([]);
-          return;
-        }
-
-        const allCourses = courseSnapshot.val();
-        const studentCoursesDetails = enrolledCourses
-          .map((courseId) => allCourses[courseId])
-          .filter((course) => course);
-
-        callback(studentCoursesDetails);
-      });
-    })
-    .catch((error) => {
-      console.error("Error fetching myCourses:", error);
-      callback([]);
-    });
-}
-function myCourses(studentId, callback) {
-  const coursesRef = firebase.database().ref("students-courses");
-
-  coursesRef
-    .once("value", (snapshot) => {
-      if (!snapshot.exists()) {
-        console.log("No courses found.");
-        callback([]);
-        return;
-      }
-
-      const enrolledCourses = [];
-      const studentCourses = snapshot.val();
-
-      for (let key in studentCourses) {
-        const course = studentCourses[key];
-        if (course.student_id === studentId && course.status === "enrolled") {
-          enrolledCourses.push(course.course_id);
-        }
-      }
-
-      if (enrolledCourses.length === 0) {
-        console.log("No enrolled courses found for student:", studentId);
-        callback([]);
-        return;
-      }
-
-      const allCoursesRef = firebase.database().ref("courses");
-      allCoursesRef.once("value", (courseSnapshot) => {
-        if (!courseSnapshot.exists()) {
-          console.log("No course details found.");
-          callback([]);
-          return;
-        }
-
-        const allCourses = courseSnapshot.val();
-        const studentCoursesDetails = enrolledCourses
-          .map((courseId) => allCourses[courseId])
-          .filter((course) => course);
-
-        callback(studentCoursesDetails);
-      });
-    })
-    .catch((error) => {
-      console.error("Error fetching myCourses:", error);
-      callback([]);
-    });
-}
-function filterByCategory(category, callback) {
-  const coursesRef = firebase.database().ref("courses");
-
-  coursesRef
-    .once("value", (snapshot) => {
-      if (!snapshot.exists()) {
-        console.log("No courses found.");
-        callback([]);
-        return;
-      }
-
-      const filteredCourses = [];
-      snapshot.forEach((childSnapshot) => {
-        const course = childSnapshot.val();
-        if (course.category === category) {
-          filteredCourses.push(course);
-        }
-      });
-
-      callback(filteredCourses);
-    })
-    .catch((error) => {
-      console.error("Error filtering courses by category:", error);
-      callback([]);
-    });
-}
-function filterByWord(word, callback) {
-  const coursesRef = firebase.database().ref("courses");
-
-  coursesRef
-    .once("value", (snapshot) => {
-      if (!snapshot.exists()) {
-        console.log("No courses found.");
-        callback([]);
-        return;
-      }
-
-      const filteredCourses = [];
-      snapshot.forEach((childSnapshot) => {
-        const course = childSnapshot.val();
-        if (
-          course.title.toLowerCase().includes(word.toLowerCase()) ||
-          course.description.toLowerCase().includes(word.toLowerCase())
-        ) {
-          filteredCourses.push(course);
-        }
-      });
-
-      callback(filteredCourses);
-    })
-    .catch((error) => {
-      console.error("Error filtering courses by word:", error);
-      callback([]);
-    });
-}
-function currentCourse(courseId, callback) {
-  const courseRef = firebase.database().ref("courses").child(courseId);
-
-  courseRef
-    .once("value", (snapshot) => {
-      if (snapshot.exists()) {
-        callback({ id: snapshot.key, ...snapshot.val() });
-      } else {
-        callback(null);
-      }
-    })
-    .catch((error) => {
-      console.error("Error fetching course:", error);
-      callback(null);
-    });
-}
-function addToWishlist(courseId) {
-  if (!courseId) {
-    console.error("Invalid course ID!");
-    return;
-  }
-
-  fetchCourseById(courseId, (course) => {
-    if (!course) {
-      console.error("Course not found!");
-      return;
+  try {
+    if (totalLessons === 0) {
+      throw new Error("Total lessons cannot be zero.");
     }
-    // Storage.saveLocalData("wishlist",{});
-    Storage.manageLocalSpecific("wishlist", courseId, course, "create");
-    console.log(`Course "${course.title}" added to wishlist.`);
-  });
+
+    const progress = Math.round((completedLessons / totalLessons) * 100);
+    const studentCourseRef = database.ref(
+      `students-courses/${studentId}_${courseId}`
+    );
+    studentCourseRef
+      .update({
+        progress: progress,
+      })
+      .then(() => {
+        console.log(
+          `Progress updated to ${progress}% for student ${studentId} in course ${courseId}`
+        );
+      })
+      .catch((error) => {
+        console.error("Error updating progress:", error);
+      });
+  } catch (error) {
+    console.error("Error updating progress:", error);
+    throw error;
+  }
 }
 
+function getStudentCourseStatus(studentId, courseId) {
+  try {
+    const studentCourseRef = database.ref(
+      `students-courses/${studentId}_${courseId}`
+    );
+    studentCourseRef
+      .once("value", (snapshot) => {
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          console.log(
+            `Student ${studentId} is ${data.status} in course ${courseId}, progress: ${data.progress}%`
+          );
+        } else {
+          console.log(
+            `Student ${studentId} is not enrolled in course ${courseId}`
+          );
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching student course status:", error);
+      });
+  } catch (error) {
+    console.error("Error fetching student course status:", error);
+    throw error;
+  }
+}
 
+function myCourses(studentId, callback) {
+  try {
+    const coursesRef = database.ref("students-courses");
+    coursesRef
+      .once("value", (snapshot) => {
+        if (!snapshot.exists()) {
+          callback([]);
+          return;
+        }
+
+        const enrolledCourses = [];
+        const studentCourses = snapshot.val();
+
+        for (let key in studentCourses) {
+          const course = studentCourses[key];
+          if (course.student_id === studentId && course.status === "enrolled") {
+            enrolledCourses.push(course.course_id);
+          }
+        }
+
+        if (enrolledCourses.length === 0) {
+          callback([]);
+          return;
+        }
+
+        const allCoursesRef = database.ref("courses");
+        allCoursesRef.once("value", (courseSnapshot) => {
+          if (!courseSnapshot.exists()) {
+            callback([]);
+            return;
+          }
+
+          const allCourses = courseSnapshot.val();
+          const studentCoursesDetails = enrolledCourses
+            .map((courseId) => allCourses[courseId])
+            .filter((course) => course);
+
+          callback(studentCoursesDetails);
+        });
+      })
+      .catch((error) => {
+        console.error("Error fetching myCourses:", error);
+        callback([]);
+      });
+  } catch (error) {
+    console.error("Error fetching myCourses:", error);
+    throw error;
+  }
+}
+
+function filterByCategory(category, callback) {
+  try {
+    const coursesRef = database.ref("courses");
+    coursesRef
+      .once("value", (snapshot) => {
+        if (!snapshot.exists()) {
+          callback([]);
+          return;
+        }
+
+        const filteredCourses = [];
+        snapshot.forEach((childSnapshot) => {
+          const course = childSnapshot.val();
+          if (course.category === category) {
+            filteredCourses.push(course);
+          }
+        });
+
+        callback(filteredCourses);
+      })
+      .catch((error) => {
+        console.error("Error filtering courses by category:", error);
+        callback([]);
+      });
+  } catch (error) {
+    console.error("Error filtering courses by category:", error);
+    throw error;
+  }
+}
+
+function filterByWord(word, callback) {
+  try {
+    const coursesRef = database.ref("courses");
+    coursesRef
+      .once("value", (snapshot) => {
+        if (!snapshot.exists()) {
+          callback([]);
+          return;
+        }
+
+        const filteredCourses = [];
+        snapshot.forEach((childSnapshot) => {
+          const course = childSnapshot.val();
+          if (
+            course.title.toLowerCase().includes(word.toLowerCase()) ||
+            course.description.toLowerCase().includes(word.toLowerCase())
+          ) {
+            filteredCourses.push(course);
+          }
+        });
+
+        callback(filteredCourses);
+      })
+      .catch((error) => {
+        console.error("Error filtering courses by word:", error);
+        callback([]);
+      });
+  } catch (error) {
+    console.error("Error filtering courses by word:", error);
+    throw error;
+  }
+}
+
+function currentCourse(courseId, callback) {
+  try {
+    const courseRef = database.ref("courses").child(courseId);
+    courseRef
+      .once("value", (snapshot) => {
+        if (snapshot.exists()) {
+          callback({ id: snapshot.key, ...snapshot.val() });
+        } else {
+          callback(null);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching course:", error);
+        callback(null);
+      });
+  } catch (error) {
+    console.error("Error fetching course:", error);
+    throw error;
+  }
+}
+
+function addToWishlist(courseId) {
+  try {
+    this.fetchCourseById(courseId, (course) => {
+      if (!course) {
+        throw new Error("Course not found!");
+      }
+
+      let wishlist = Storage.fetchLocalData("wishlist") || [];
+      for (let i = 0; i < wishlist.length; i++) {
+        if (wishlist[i].id === course.id) {
+          throw new Error(
+            `Course "${course.title}" is already in the wishlist.`
+          );
+        }
+      }
+      wishlist.push(course);
+      Storage.saveLocalData("wishlist", wishlist);
+      console.log(`Course "${course.title}" added to wishlist.`);
+    });
+  } catch (error) {
+    console.error("Error adding to wishlist:", error);
+    throw error;
+  }
+}
+
+function fetchWishlist(callback) {
+  try {
+    const wishlist = Storage.fetchLocalData("wishlist") || [];
+    callback(wishlist);
+  } catch (error) {
+    console.error("Error fetching wishlist:", error);
+    throw error;
+  }
+}
+
+function removeFromWishlist(courseId) {
+  try {
+    this.fetchCourseById(courseId, (course) => {
+      let wishlist = Storage.fetchLocalData("wishlist") || [];
+      const courseIndex = wishlist.findIndex((item) => item.id === courseId);
+
+      if (courseIndex !== -1) {
+        wishlist.splice(courseIndex, 1);
+        Storage.saveLocalData("wishlist", wishlist);
+        console.log(`Course "${course.title}" removed from wishlist.`);
+      } else {
+        throw new Error(`Course "${course.title}" not found in wishlist.`);
+      }
+    });
+  } catch (error) {
+    console.error("Error removing from wishlist:", error);
+    throw error;
+  }
+}
+
+function fetchLessons(courseId, callback) {
+  try {
+    const lessonsRef = database.ref(`courses/${courseId}/lessons`);
+    lessonsRef.once("value", (snapshot) => {
+      const lessons = snapshot.val();
+      if (lessons) {
+        callback(lessons);
+      } else {
+        throw new Error("No lessons found for this course!");
+      }
+    });
+  } catch (error) {
+    console.error("Error fetching lessons:", error);
+    throw error;
+  }
+}

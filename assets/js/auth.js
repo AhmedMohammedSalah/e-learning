@@ -119,12 +119,15 @@ const handleRegistration = async (event) => {
   }
 };
 
-const handleLogin = async (event) => {
+const handleLogin = async ( event ) => {
   event.preventDefault();
 
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-
+  const email = document.getElementById( "email" ).value;
+  const password = document.getElementById( "password" ).value;
+  // if ( email = "" && password= "") {
+    
+  //   return;
+  // }
   // Validate email
   if (!validateEmail(email)) {
     showError("emailError", "Please enter a valid email address.");

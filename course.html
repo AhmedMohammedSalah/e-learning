@@ -315,51 +315,13 @@
         </div>
     </footer>
 
-    <script>
-        // Function to toggle Read More
-        function toggleReadMore () {
-            const readMoreElements = document.querySelectorAll( '.read-more' );
-            const button = document.querySelector( '.read-more-button' );
-
-            readMoreElements.forEach( element => {
-                if ( element.style.display === "none" || element.style.display === "" ) {
-                    element.style.display = "list-item";
-                    button.textContent = "Read Less";
-                } else {
-                    element.style.display = "none";
-                    button.textContent = "Read More";
-                }
-            } );
-        }
-
-        // Function to hide aside when it reaches the footer
-        window.addEventListener( 'scroll', () => {
-            const aside = document.getElementById( 'aside' );
-            const footer = document.getElementById( 'footer' );
-            const footerTop = footer.getBoundingClientRect().top;
-
-            if ( footerTop < window.innerHeight ) {
-                aside.classList.add( 'aside-hidden' );
-            } else {
-                aside.classList.remove( 'aside-hidden' );
-            }
-        } );
-
-        // Function to handle Add to Card
-        document.getElementById( 'add-to-card' ).addEventListener( 'click', () => {
-            // Save course details to localStorage
-            const course = {
-                title: "The Complete AI-Powered Copywriting Course & ChatGPT Course",
-                price: "E2249.99",
-                discount: "E4,099.99",
-                image: "./assets/images/80579746_8e0c_2 (1).jpg"
-            };
-            localStorage.setItem( 'cart', JSON.stringify( course ) );
-
-            // Redirect to lessons page
-            window.location.href = "lesson.html";
-        } );
-    </script>
+<script src="https://www.gstatic.com/firebasejs/8.6.7/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.6.7/firebase-database.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+<script src="./firebase/config.js"></script>
+<script src="./assets/js/storage.js"></script>
+<script src="./assets/js/courses.js"></script>
+<script src="./assets/js/course.js"></script>
 </body>
 
 </html>

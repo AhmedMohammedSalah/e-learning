@@ -1,38 +1,44 @@
-// // index.js
-// document.addEventListener('DOMContentLoaded', () => {
-//     const courses = CourseManager.getCourses();  // Get courses from LocalStorage or Firebase
-//     displayCourses(courses);
-// });
+document.addEventListener("DOMContentLoaded", function () {
+  const coursesContainer = document.querySelector(".row");
 
-// function displayCourses(courses) {
-//     const container = document.getElementById("coursesContainer");
-//     container.innerHTML = "";  
-//     courses.forEach(course => {
-//         const courseDiv = document.createElement("div");
-//         courseDiv.innerHTML = `
-//             <h3>${course.title}</h3>
-//             <p>${course.category}</p>
-//             <p>${course.description}</p>
-//         `;
-//         container.appendChild(courseDiv);
-//     });
-// }
+  function renderCourses(courses) {
+    coursesContainer.innerHTML = ""; 
 
-// document.getElementById("categoryFilter").addEventListener("change", filterCourses);
-// document.getElementById("searchInput").addEventListener("input", filterCourses);
-
-// function filterCourses() {
-//     const category = document.getElementById("categoryFilter").value;
-//     const searchQuery = document.getElementById("searchInput").value.toLowerCase();
-
-//     const filteredCourses = CourseManager.getCourses().filter(course => {
-//         return (category ? course.category === category : true) && 
-//             (course.title.toLowerCase().includes(searchQuery) || course.description.toLowerCase().includes(searchQuery));
-//     });
-
-//     displayCourses(filteredCourses);
-// }
-
-
-
-console.log(x);
+    Object.values(courses || {}).forEach((course) => {
+      const courseCard = `
+        <div class="col-lg-4 mb-5">
+          <div class="card border-0 bg-light shadow-sm pb-2">
+            <img class="card-img-top mb-2" src="${
+              course.image || "./assets/images/fakeimg.png"
+            }" alt="${course.title}">
+            <div class="card-body text-center">
+              <h4 class="card-title">${course.title}</h4>
+              <p class="card-text">${course.description}</p>
+            </div>
+            <div class="card-footer bg-transparent py-4 px-5">
+              <div class="row border-bottom">
+                <div class="col-6 py-1 text-right border-right"><strong>Category</strong></div>
+                <div class="col-6 py-1">${course.category || "General"}</div>
+              </div>
+              <div class="row border-bottom">
+                <div class="col-6 py-1 text-right border-right"><strong>Instructor</strong></div>
+                <div class="col-6 py-1">${course.instructor || "Unknown"}</div>
+              </div>
+              <div class="row border-bottom">
+                <div class="col-6 py-1 text-right border-right"><strong>Duration</strong></div>
+                <div class="col-6 py-1">${course.duration || "N/A"} hours</div>
+              </div>
+              <div class="row">
+                <div class="col-6 py-1 text-right border-right"><strong>Price</strong></div>
+                <div class="col-6 py-1">$${course.price || "Free"}</div>
+              </div>
+            </div>
+            <a href="#" class="btn btn-primary px-4 mx-auto mb-4">Join Now</a>
+          </div>
+        </div>
+      `;
+      coursesContainer.innerHTML += courseCard;
+    });
+  }
+  fetchCourses(renderCourses);
+});
