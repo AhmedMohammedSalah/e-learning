@@ -192,7 +192,7 @@ const handleLogin = async (event) => {
   try {
     const userData = await loginUserWithFirebase(email, password);
     alert("Login successful! Redirecting to Home page...");
-    window.location.href = "./student.html";
+    window.location.href = "e-learning/student.html";
   } catch (error) {
     console.error("Error during login: ", error);
 
