@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const coursesContainer = document.querySelector(".row");
 
   function renderCourses(courses) {
-    coursesContainer.innerHTML = ""; 
+    coursesContainer.innerHTML = "";
 
     Object.values(courses || {}).forEach((course) => {
       const courseCard = `
@@ -33,7 +33,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 <div class="col-6 py-1">$${course.price || "Free"}</div>
               </div>
             </div>
-            <a href="#" class="btn btn-primary px-4 mx-auto mb-4">Join Now</a>
+            <a href="./login.html" class="btn btn-primary px-4 mx-auto mb-4" >Join Now</a>
           </div>
         </div>
       `;

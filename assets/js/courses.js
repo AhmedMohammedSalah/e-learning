@@ -163,26 +163,41 @@ function enrollStudent(studentId, courseId) {
   }
 }
 
-function approveEnrollment(studentId, courseId) {
+async function enrollStudent(studentId, courseId) {
   try {
     const studentCourseRef = database.ref(
       `students-courses/${studentId}_${courseId}`
     );
-    studentCourseRef
-      .update({
-        status: "enrolled",
-        progress: 0,
-      })
-      .then(() => {
-        console.log(
-          `Student ${studentId} has been enrolled in course ${courseId}`
+
+    // Check if the enrollment record already exists
+    const snapshot = await studentCourseRef.once("value");
+
+    if (snapshot.exists()) {
+      const enrollmentData = snapshot.val();
+
+      if (enrollmentData.status === "enrolled") {
+        alert("You are already enrolled in this course!");
+      } else if (enrollmentData.status === "pending") {
+        alert(
+          "Your enrollment request is already sent. Please wait for approval."
         );
-      })
-      .catch((error) => {
-        console.error("Error approving enrollment:", error);
+      }
+    } else {
+      await studentCourseRef.set({
+        student_id: studentId,
+        course_id: courseId,
+        status: "pending",
+        progress: 0,
       });
+
+      console.log(
+        `Student ${studentId} requested to enroll in course ${courseId}`
+      );
+      alert("Enrollment request sent successfully!");
+    }
   } catch (error) {
-    console.error("Error approving enrollment:", error);
+    console.error("Error enrolling student:", error);
+    alert("An error occurred while processing your request. Please try again.");
     throw error;
   }
 }
