@@ -273,7 +273,7 @@ li a.active {
 .navbar .logo {
   font-size: 24px;
   font-weight: bold;
-  color: var(--white);
+  color: var(--primary);
   text-decoration: none;
   transition: 0.3s;
 }
