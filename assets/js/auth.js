@@ -125,7 +125,7 @@ const handleRegistration = async (event) => {
 //   const email = document.getElementById( "email" ).value;
 //   const password = document.getElementById( "password" ).value;
 //   // if ( email = "" && password= "") {
-    
+
 //   //   return;
 //   // }
 //   // Validate email
@@ -179,12 +179,12 @@ const handleLogin = async (event) => {
   }
 
   // ** Hardcoded Admin Login **
-  const adminEmail = "admin@gmail.com"; 
-  const adminPassword = "admin123"; 
+  const adminEmail = "admin@gmail.com";
+  const adminPassword = "admin123";
 
   if (email === adminEmail && password === adminPassword) {
     alert("Admin login successful! Redirecting to Admin Dashboard...");
-    window.location.href = "../../admin.html"; 
+    window.location.href = "../../admin.html";
     return;
   }
 
@@ -192,11 +192,10 @@ const handleLogin = async (event) => {
   try {
     const userData = await loginUserWithFirebase(email, password);
     alert("Login successful! Redirecting to Home page...");
-    window.location.href = "../../student.html";
+    window.location.href = "student.html";
   } catch (error) {
     console.error("Error during login: ", error);
 
-    
     if (
       error.code === "auth/user-not-found" ||
       error.code === "auth/wrong-password"
