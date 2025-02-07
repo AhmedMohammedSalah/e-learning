@@ -13,12 +13,12 @@
     <div class="sidebar">
         <h2>Admin Panel</h2>
         <ul>
-            <li><a href="#dashboard">Dashboard</a></li>
+            <li><a href="#dashboard">Add Lessons</a></li>
             <li><a href="#courses">Courses</a></li>
             <li><a href="#categories">Categories</a></li>
             <li><a href="#students">Students</a></li>
             <li><a href="#approvals">Approvals</a></li>
-            <li class="logout-link"><a href="#" onclick="logout()">Logout</a></li>
+            <li class="logout-link"><a href="login.html" onclick="logout()">Logout</a></li>
         </ul>
     </div>
 
@@ -26,10 +26,44 @@
     <div class="main-content">
         <!-- Dashboard Section -->
         <section id="dashboard" class="section">
-            <h2>Dashboard</h2>
+            <h2>Lessons Section</h2>
             <button class="add-btn" onclick="openAddLessonForm()">+ Add Lesson</button>
-
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Course Title</th>
+                        <th>Lesson Title</th>
+                        <th>Link of video</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="lessons-table-body"></tbody>
+            </table>
+        
+            <!-- نموذج إضافة درس -->
+            <div id="lessonForm" class="form-popup" style="display: none;">
+                <div class="form-container">
+                    <h2>Add New Lesson</h2>
+                    
+                    <label for="lesson-course">Select Course:</label>
+                    <select id="lesson-course"></select>
+        
+                    <label>Lesson Title:</label>
+                    <input type="text" id="lesson-title" placeholder="Enter lesson title">
+        
+                    <label>Video URL:</label>
+                    <input type="text" id="lesson-video-url" placeholder="Enter video URL">
+        
+                    <label>Description:</label>
+                    <textarea id="lesson-desc" placeholder="Enter lesson description"></textarea>
+        
+                    <button class="submit-btn" onclick="addLesson()">Save</button>
+                    <button class="close-btn" onclick="closeForm('lessonForm')">Close</button>
+                </div>
+            </div>
         </section>
+        
 
         <!-- Courses Section -->
         <section id="courses" class="section">
@@ -47,7 +81,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- سيتم ملء هذا الجدول بالكورسات من Firebase -->
+                 
                 </tbody>
             </table>
         </section>
@@ -64,7 +98,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- سيتم ملء هذا الجدول بالفئات من Firebase -->
+                    
                 </tbody>
             </table>
         </section>
@@ -81,7 +115,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- سيتم ملء هذا الجدول ببيانات الطلاب من Firebase -->
+                   
                 </tbody>
             </table>
         </section>
@@ -91,14 +125,20 @@
             <h2>Course Approvals</h2>
             <table>
                 <thead>
-                    <tr>
+                    <!-- <tr>
                         <th>Student Name</th>
                         <th>Requested Course</th>
                         <th>Actions</th>
+                    </tr> -->
+                    <tr>
+                        <th>Student ID</th>
+                        <th>Course ID</th>
+                        <th>Status</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <!-- سيتم ملء هذا الجدول بطلبات الموافقة من Firebase -->
+
+                  <tbody id="requests-table-body">
                 </tbody>
             </table>
         </section>
@@ -112,11 +152,12 @@
             <input type="text" id="course-title" placeholder="Enter course title">
 
             <label>Image:</label>
-            <input type="file" id="course-image">
+            <input type="text" id="course-image" placeholder="Enter course image URL">
+
 
             <label>Category:</label>
             <select id="course-category">
-                <!-- سيتم ملء هذا الـ select بالفئات من Firebase -->
+              
             </select>
 
             <label>Instructor Name:</label>
@@ -131,8 +172,7 @@
             <label>Duration:</label>
             <input type="text" id="course-duration" placeholder="Enter duration (e.g., 4 weeks)">
 
-            <label>Content (Videos, PDFs, etc.):</label>
-            <input type="file" id="course-content" multiple>
+
 
             <button class="submit-btn" onclick="addCourse()">Save</button>
             <button class="close-btn" onclick="closeForm('courseForm')">Close</button>
@@ -143,8 +183,7 @@
     <div id="editCourseForm" class="form-popup">
         <div class="form-container">
             <h2>Edit Course</h2>
-            <label>Course ID:</label>
-            <input type="text" id="course-id" value="12345" disabled>
+            
 
             <label>Title:</label>
             <input type="text" id="edit-course-title">
@@ -167,8 +206,6 @@
             <label>Duration:</label>
             <input type="text" id="edit-course-duration">
 
-            <label>Content:</label>
-            <input type="file" id="edit-course-content" multiple>
 
             <button class="submit-btn">Update</button>
             <button class="close-btn" onclick="closeForm('editCourseForm')">Close</button>
@@ -191,8 +228,8 @@
     <div id="editCategoryForm" class="form-popup">
         <div class="form-container">
             <h2>Edit Category</h2>
-            <label>Category ID:</label>
-            <input type="text" id="category-id" value="C123" disabled>
+            <!-- <label>Category ID:</label>
+            <input type="text" id="category-id" value="C123" disabled> -->
 
             <label>Category Name:</label>
             <input type="text" id="edit-category-name">
@@ -203,26 +240,24 @@
     </div>
 
     <!-- Add Lesson Form -->
-    <div id="addLessonForm" class="form-popup">
-        <div class="form-container">
-            <h2>Add New Lesson</h2>
-            <label>Course:</label>
-            <select id="lesson-course">
+   
+<div id="editLessonForm" class="form-popup">
+    <div class="form-container">
+        <h2>Edit Lesson</h2>
+        <label>Lesson Title:</label>
+        <input type="text" id="edit-lesson-title" placeholder="Enter lesson title">
 
-            </select>
+        <label>Video URL:</label>
+        <input type="text" id="edit-lesson-video-url" placeholder="Enter video URL">
 
-            <label>Lesson Title:</label>
-            <input type="text" id="lesson-title" placeholder="Enter lesson title">
+        <label>Description:</label>
+        <textarea id="edit-lesson-desc" placeholder="Enter lesson description"></textarea>
 
-            <label>Video URL:</label>
-            <input type="text" id="lesson-video-url" placeholder="Enter video URL">
+        <button class="submit-btn" onclick="editLesson()">Update</button>
+        <button class="close-btn" onclick="closeForm('editLessonForm')">Close</button>
+    </div>
+</div>
 
-            <label>Description:</label>
-            <textarea id="lesson-desc" placeholder="Enter lesson description"></textarea>
-
-            <button class="submit-btn" onclick="addLesson()">Save</button>
-            <button class="close-btn" onclick="closeForm('addLessonForm')">Close</button>
-        </div>
     </div>
 
     <!-- Firebase SDK -->
