@@ -119,16 +119,52 @@ const handleRegistration = async (event) => {
   }
 };
 
-const handleLogin = async ( event ) => {
+// const handleLogin = async ( event ) => {
+//   event.preventDefault();
+
+//   const email = document.getElementById( "email" ).value;
+//   const password = document.getElementById( "password" ).value;
+//   // if ( email = "" && password= "") {
+    
+//   //   return;
+//   // }
+//   // Validate email
+//   if (!validateEmail(email)) {
+//     showError("emailError", "Please enter a valid email address.");
+//     return;
+//   } else {
+//     clearError("emailError");
+//   }
+
+//   // Validate password
+//   if (!validatePassword(password)) {
+//     alert("Password must be at least 6 characters long.");
+//     return;
+//   }
+
+//   try {
+//     await loginUserWithFirebase(email, password);
+//     alert("Login successful! Redirecting to Home page...");
+//     window.location.href = "../../student.html";
+//   } catch (error) {
+//     alert("Error: " + error.message);
+//   }
+// };
+
+// Attach Event Listeners
+const handleLogin = async (event) => {
   event.preventDefault();
 
-  const email = document.getElementById( "email" ).value;
-  const password = document.getElementById( "password" ).value;
-  // if ( email = "" && password= "") {
-    
-  //   return;
-  // }
-  // Validate email
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
+
+  // التحقق من الحقول الفارغة
+  if (!email || !password) {
+    alert("Please fill in all fields.");
+    return;
+  }
+
+  // التحقق من صحة البريد الإلكتروني
   if (!validateEmail(email)) {
     showError("emailError", "Please enter a valid email address.");
     return;
@@ -136,22 +172,42 @@ const handleLogin = async ( event ) => {
     clearError("emailError");
   }
 
-  // Validate password
+  // التحقق من صحة كلمة المرور
   if (!validatePassword(password)) {
     alert("Password must be at least 6 characters long.");
     return;
   }
 
+  // ** Hardcoded Admin Login **
+  const adminEmail = "admin@gmail.com"; 
+  const adminPassword = "admin123"; 
+
+  if (email === adminEmail && password === adminPassword) {
+    alert("Admin login successful! Redirecting to Admin Dashboard...");
+    window.location.href = "../../admin.html"; 
+    return;
+  }
+
+  // ** تسجيل الدخول للمستخدم العادي **
   try {
-    await loginUserWithFirebase(email, password);
+    const userData = await loginUserWithFirebase(email, password);
     alert("Login successful! Redirecting to Home page...");
     window.location.href = "../../student.html";
   } catch (error) {
-    alert("Error: " + error.message);
+    console.error("Error during login: ", error);
+
+    
+    if (
+      error.code === "auth/user-not-found" ||
+      error.code === "auth/wrong-password"
+    ) {
+      alert("Invalid email or password. Please try again.");
+    } else {
+      alert("Error: " + error.message);
+    }
   }
 };
 
-// Attach Event Listeners
 const registryForm = document.getElementById("registration-form");
 if (registryForm) {
   registryForm.addEventListener("submit", handleRegistration);
@@ -176,4 +232,8 @@ const assignUserToCourse = async (userId, courseId) => {
   } catch (error) {
     console.error("Error assigning user to course: ", error);
   }
+};
+const logout = () => {
+  alert("Logout successful! Redirecting to login page...");
+  window.location.href = "../../login.html"; // توجيه إلى صفحة تسجيل الدخول
 };
