@@ -184,7 +184,7 @@ const handleLogin = async (event) => {
 
   if (email === adminEmail && password === adminPassword) {
     alert("Admin login successful! Redirecting to Admin Dashboard...");
-    window.location.href = "../../admin.html";
+    window.location.href = "./admin.html";
     return;
   }
 

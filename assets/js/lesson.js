@@ -99,7 +99,6 @@ function updateProgress(studentId, courseId, completedLessons, totalLessons) {
     .update({ progress });
 }
 
-// 🔹 التحقق مما إذا كان الطالب أكمل جميع الدروس
 function checkIfAllLessonsWatched(studentId, courseId, lessons) {
   const lessonIds = Object.keys(lessons);
   let watchedCount = 0;
@@ -119,7 +118,6 @@ function checkIfAllLessonsWatched(studentId, courseId, lessons) {
   });
 }
 
-// 🔹 وضع علامة على الدرس كمشاهد
 function markLessonAsWatched(studentId, courseId, lessonId, lessons) {
   database
     .ref(`students-courses/${studentId}_${courseId}/watched/${lessonId}`)
