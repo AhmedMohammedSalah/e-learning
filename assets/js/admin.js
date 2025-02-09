@@ -323,40 +323,60 @@ function addCourse() {
   const description = document.getElementById("course-desc").value;
   const price = document.getElementById("course-price").value;
   const duration = document.getElementById("course-duration").value;
-  const image = document.getElementById("course-image").value; // أخذ رابط الصورة
+  const image = document.getElementById("course-image").value; // Get image URL
 
-  if (!title || !category || !instructor || !description || !price || !duration || !image) {
-      alert("Please fill all fields!");
-      return;
+  // Validate input fields
+  if (
+    !title ||
+    !category ||
+    !instructor ||
+    !description ||
+    !price ||
+    !duration ||
+    !image
+  ) {
+    alert("Please fill all fields!");
+    return;
   }
 
   const coursesRef = database.ref("courses");
-  coursesRef.orderByChild("title").equalTo(title).once("value", (snapshot) => {
+
+  // Check for duplicate course title
+  coursesRef
+    .orderByChild("title")
+    .equalTo(title)
+    .once("value", (snapshot) => {
       if (snapshot.exists()) {
-          alert("Course with this title already exists!");
-          return;
+        alert("Course with this title already exists!");
+        return;
       }
 
       const newCourse = {
-          title,
-          category,
-          instructor,
-          description,
-          price,
-          duration,
-          image // إضافة الصورة إلى البيانات
+        title,
+        category,
+        instructor,
+        description,
+        price,
+        duration,
+        image, // Add image to the data
       };
-        newCourse.id = newCourseRef.key;
-      coursesRef.push(newCourse)
-          .then(() => {
-              alert("Course added successfully!");
-              closeForm("courseForm");
-              fetchCourses(); // تحديث الجدول بعد الإضافة
-          })
-          .catch((error) => {
-              alert("Error adding course: " + error.message);
-          });
-  });
+
+      // Create a new reference for the course
+      const newCourseRef = coursesRef.push();
+      newCourse.id = newCourseRef.key; // Set the ID for the new course
+
+      // Push the new course to the database
+      newCourseRef
+        .set(newCourse)
+        .then(() => {
+          alert("Course added successfully!");
+          closeForm("courseForm");
+          fetchCourses(); // Update the table after addition
+        })
+        .catch((error) => {
+          alert("Error adding course: " + error.message);
+        });
+    });
 }
 
 

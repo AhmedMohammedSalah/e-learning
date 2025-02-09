@@ -502,6 +502,11 @@ footer {
   max-width: 100%;
   height: auto;
   border-radius: 10px;
+  transition: transform 0.3s ease; /* إضافة تأثير انتقال سلس */
+}
+
+.hero-image img:hover {
+  transform: scale(1.2); /* تكبير الصورة عند التحويم */
 }
 
 .facilities-section {
@@ -510,13 +515,24 @@ footer {
   gap: 1rem;
   padding: 2rem;
 }
-
 .facility-card {
   background-color: var(--light);
   padding: 1rem;
   border-radius: 10px;
   text-align: center;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease; /* إضافة تأثير انتقال سلس */
+}
+
+.facility-card:hover {
+  background-color: var(--cyan); /* تغيير لون الخلفية */
+  color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* زيادة الظل */
+  transform: translateY(-5px); /* رفع العنصر قليلاً */
+}
+.facility-card:hover p
+{
+  color: white;
 }
 
 .facility-card i {
@@ -731,7 +747,12 @@ li a.active {
   flex-wrap: wrap;
   justify-content: space-between;
 }
-
+.courses-content img
+{
+width: 100%;
+height: 250px;
+object-fit: fill;
+}
 .col-lg-4 {
   flex: 0 0 32%;
   max-width: 32%;
@@ -743,6 +764,12 @@ li a.active {
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   overflow: hidden;
+  transition: all 0.3s ease; /* إضافة تأثير انتقال سلس */
+}
+
+.card:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* زيادة الظل */
+  transform: scale(1); /* الحفاظ على الحجم ثابتًا */
 }
 
 .card-img-top {
@@ -769,6 +796,22 @@ li a.active {
   background-color: #f8f9fa;
 }
 
+.card .btn {
+
+  display: inline-block;
+  padding: 10px 20px;
+  font-size: 1rem;
+  color: #fff;
+  background-color: var(--primary);
+  border: none;
+  border-radius: 5px;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  margin-top: 20px;
+  margin-left: 130px;
+
+}
 .btn {
 
   display: inline-block;
@@ -781,8 +824,9 @@ li a.active {
   text-align: center;
   text-decoration: none;
   cursor: pointer;
-}
 
+
+}
 .btn:hover {
   background-color: #0056b3;
 }

@@ -1,197 +1,184 @@
-document.addEventListener("DOMContentLoaded", function () {
-  // Extract courseId from the URL
+document.addEventListener("DOMContentLoaded", initCoursePage);
+
+function initCoursePage() {
   const urlParams = new URLSearchParams(window.location.search);
   const courseId = urlParams.get("id");
-  console.log(courseId);
 
-  // if (!courseId) {
-  //   console.error("Course ID not found in URL!");
-  //   alert("Invalid course URL. Please check the link and try again.");
-  //   return;
-  // }
+  if (!courseId) {
+    console.error("Course ID not found in URL!");
+    alert("Invalid course URL. Please check the link and try again.");
+    return;
+  }
 
-  // Fetch course data from Firebase
- 
-  fetchLessons(courseId, (lessons) => {
-    console.log("Lessons loaded:", lessons);
+  fetchCourseData(courseId, (course) => {
+    displayCourseData(course);
+    fetchLessons(courseId, displayLessons);
   });
 
-  // // Find if lessons watched or no
-  // function markLessonAsWatched(lessonId, lessons) {
-  //   database
-  //     .ref(`students-courses/${studentId}_${courseId}/watched/${lessonId}`)
-  //     .set(true);
-  //   database
-  //     .ref(`students-courses/${studentId}_${courseId}/watched`)
-  //     .once("value", (snapshot) => {
-  //       const watchedLessons = snapshot.val() || {};
-  //       const completedLessons = Object.keys(watchedLessons).length;
-  //       updateProgress(completedLessons, Object.keys(lessons).length);
-  //       if (completedLessons === Object.keys(lessons).length) {
-  //         document.getElementById("certificate-button").style.display = "block";
-  //       }
-  //     });
-  // }
+  attachEventListeners();
+}
 
-  // // When Student Watches Last Lesson, Get Certificate
-  // function checkIfAllLessonsWatched(studentId, courseId, lessons) {
-  //   const lessonIds = Object.keys(lessons);
-  //   let watchedCount = 0;
+// 🔹 تحميل بيانات الدورة من Firebase
+function fetchCourseData(courseId, callback) {
+  database.ref(`courses/${courseId}`).once("value", (snapshot) => {
+    if (snapshot.exists()) {
+      callback(snapshot.val());
+    } else {
+      console.error("Course not found!");
+      alert("This course does not exist.");
+    }
+  });
+}
 
-  //   lessonIds.forEach((lessonId) => {
-  //     const studentLessonRef = database.ref(
-  //       `students-lessons/${studentId}_${courseId}_${lessonId}`
-  //     );
-  //     studentLessonRef.once("value", (snapshot) => {
-  //       if (snapshot.exists() && snapshot.val().watched) {
-  //         watchedCount++;
-  //         if (watchedCount === lessonIds.length) {
-  //           // All lessons watched, show certificate button
-  //           document.getElementById("certificate-button").style.display =
-  //             "block";
-  //         }
-  //       }
-  //     });
-  //   });
-  // }
+// 🔹 عرض بيانات الدورة في HTML
+function displayCourseData(course) {
+  if (!course) return;
 
-  // // Redirect To Certificate Page
-  // function redirectToCertificate() {
-  //   window.location.href = `certificate.html?studentId=${studentId}&courseId=${courseId}`;
-  // }
+  document.getElementById("course-title").textContent =
+    course.title || "Course Title";
+  document.getElementById("course-description").textContent =
+    course.description || "No description available.";
+}
 
-  // // Update progress par
-  // function updateProgress(completedLessons, totalLessons) {
-  //   const progress = Math.round((completedLessons / totalLessons) * 100);
-  //   document.getElementById("progress-bar").style.width = `${progress}%`;
-  //   document.getElementById(
-  //     "progress-text"
-  //   ).textContent = `Progress: ${completedLessons}/${totalLessons} videos completed`;
-  //   database
-  //     .ref(`students-courses/${studentId}_${courseId}`)
-  //     .update({ progress });
-  // }
+// 🔹 تحميل بيانات الدروس من Firebase
+function fetchLessons(courseId, callback) {
+  database.ref(`courses/${courseId}/lessons`).once("value", (snapshot) => {
+    if (snapshot.exists()) {
+      callback(snapshot.val());
+    } else {
+      console.warn("No lessons found for this course.");
+    }
+  });
+}
 
-  // // Connect Course ID with Student ID and Send Progress to Admin
-  // function updateStudentProgress(studentId, courseId, progress) {
-  //   const studentCourseRef = database.ref(
-  //     `students-courses/${studentId}_${courseId}`
-  //   );
-  //   studentCourseRef
-  //     .update({
-  //       progress: progress,
-  //       lastUpdated: firebase.database.ServerValue.TIMESTAMP,
-  //     })
-  //     .then(() => {
-  //       console.log("Progress updated successfully");
-  //     })
-  //     .catch((error) => {
-  //       console.error("Error updating progress:", error);
-  //     });
-  // }
+// 🔹 عرض الدروس في HTML
+function displayLessons(lessons) {
+  const courseContent = document.getElementById("course-content");
+  courseContent.innerHTML = "";
 
-  // // Display course data in the HTML
-  // function displayCourseData(course) {
-  //   if (!course) {
-  //     console.error("Course data is null or undefined.");
-  //     return;
-  //   }
+  Object.entries(lessons).forEach(([lessonId, lesson], index) => {
+    const lessonItem = document.createElement("div");
+    lessonItem.className = "course-item";
+    lessonItem.textContent = lesson.title || `Lesson ${index + 1}`;
+    lessonItem.dataset.id = lessonId;
+    lessonItem.dataset.videoUrl = lesson.videoUrl || "";
+    lessonItem.dataset.description = lesson.description || "";
 
-  //   // Update the course title
-  //   document.getElementById("course-title").textContent =
-  //     course.title || "Introduction to the Course";
+    lessonItem.addEventListener("click", () => loadLesson(lesson));
 
-  //   // Update the course description
-  //   document.getElementById("course-description").textContent =
-  //     course.description ||
-  //     "This course provides an overview of the essential tools and techniques needed to start your learning journey.";
-  // }
+    courseContent.appendChild(lessonItem);
+  });
 
-  // // Display lessons in the HTML
-  // function displayLessons(lessons) {
-  //   const courseContent = document.getElementById("course-content");
-  //   courseContent.innerHTML = "";
+  if (Object.keys(lessons).length > 0) {
+    loadLesson(Object.values(lessons)[0]);
+  }
+}
 
-  //   Object.entries(lessons).forEach(([lessonId, lesson], index) => {
-  //     const lessonItem = document.createElement("div");
-  //     lessonItem.className = "course-item";
-  //     lessonItem.textContent = lesson.title || `Lesson ${index + 1}`;
-  //     lessonItem.setAttribute("data-id", lessonId);
-  //     lessonItem.setAttribute("data-video-url", lesson.videoUrl || "");
-  //     lessonItem.setAttribute("data-description", lesson.description || "");
+// 🔹 تحميل الفيديو والوصف الخاص بالدرس
+function loadLesson(lesson) {
+  if (!lesson) return;
 
-  //     // Add click event to load the lesson video and description
-  //     lessonItem.addEventListener("click", () => {
-  //       loadLesson(lesson);
-  //     });
+  document.getElementById("course-video").src =
+    lesson.videoUrl ||
+    "https://www.youtube.com/embed/dQw4w9WgXcQ?rel=0&modestbranding=1";
+  document.getElementById("course-description").textContent =
+    lesson.description || "No description available.";
+}
 
-  //     courseContent.appendChild(lessonItem);
-  //   });
+// 🔹 تحديث نسبة التقدم للطالب
+function updateProgress(studentId, courseId, completedLessons, totalLessons) {
+  const progress = Math.round((completedLessons / totalLessons) * 100);
 
-  //   // Load the first lesson by default
-  //   const firstLesson = Object.values(lessons)[0];
-  //   if (firstLesson) {
-  //     loadLesson(firstLesson);
-  //   }
-  // }
+  document.getElementById("progress-bar").style.width = `${progress}%`;
+  document.getElementById(
+    "progress-text"
+  ).textContent = `Progress: ${completedLessons}/${totalLessons} videos completed`;
 
-  // // Load a specific lesson
-  // function loadLesson(lesson) {
-  //   if (!lesson) {
-  //     console.error("Lesson data is null or undefined.");
-  //     return;
-  //   }
+  database
+    .ref(`students-courses/${studentId}_${courseId}`)
+    .update({ progress });
+}
 
-  //   document.getElementById("course-video").src =
-  //     lesson.videoUrl ||
-  //     "https://www.youtube.com/embed/dQw4w9WgXcQ?rel=0&modestbranding=1";
-  //   document.getElementById("course-description").textContent =
-  //     lesson.description || "No description available.";
-  // }
+// 🔹 التحقق مما إذا كان الطالب أكمل جميع الدروس
+function checkIfAllLessonsWatched(studentId, courseId, lessons) {
+  const lessonIds = Object.keys(lessons);
+  let watchedCount = 0;
 
-  // // Handle "Previous" button click
-  // function prevVideo() {
-  //   const currentLesson = document.querySelector(".course-item.current");
-  //   if (currentLesson && currentLesson.previousElementSibling) {
-  //     const prevLesson = currentLesson.previousElementSibling;
-  //     const lesson = {
-  //       videoUrl: prevLesson.getAttribute("data-video-url"),
-  //       description: prevLesson.getAttribute("data-description"),
-  //     };
-  //     loadLesson(lesson);
+  lessonIds.forEach((lessonId) => {
+    database
+      .ref(`students-lessons/${studentId}_${courseId}_${lessonId}`)
+      .once("value", (snapshot) => {
+        if (snapshot.exists() && snapshot.val().watched) {
+          watchedCount++;
+          if (watchedCount === lessonIds.length) {
+            document.getElementById("certificate-button").style.display =
+              "block";
+          }
+        }
+      });
+  });
+}
 
-  //     // Update active class
-  //     currentLesson.classList.remove("current");
-  //     prevLesson.classList.add("current");
-  //   }
-  // }
+// 🔹 وضع علامة على الدرس كمشاهد
+function markLessonAsWatched(studentId, courseId, lessonId, lessons) {
+  database
+    .ref(`students-courses/${studentId}_${courseId}/watched/${lessonId}`)
+    .set(true);
 
-  // // Handle "Next" button click
-  // function nextVideo() {
-  //   const currentLesson = document.querySelector(".course-item.current");
-  //   if (currentLesson && currentLesson.nextElementSibling) {
-  //     const nextLesson = currentLesson.nextElementSibling;
-  //     const lesson = {
-  //       videoUrl: nextLesson.getAttribute("data-video-url"),
-  //       description: nextLesson.getAttribute("data-description"),
-  //     };
-  //     loadLesson(lesson);
+  database
+    .ref(`students-courses/${studentId}_${courseId}/watched`)
+    .once("value", (snapshot) => {
+      const watchedLessons = snapshot.val() || {};
+      const completedLessons = Object.keys(watchedLessons).length;
+      updateProgress(
+        studentId,
+        courseId,
+        completedLessons,
+        Object.keys(lessons).length
+      );
 
-  //     // Update active class
-  //     currentLesson.classList.remove("current");
-  //     nextLesson.classList.add("current");
-  //   }
-  // }
+      if (completedLessons === Object.keys(lessons).length) {
+        document.getElementById("certificate-button").style.display = "block";
+      }
+    });
+}
 
-  // // Fetch and display the course data and lessons
-  // fetchCourseData(courseId, (course) => {
-  //   displayCourseData(course);
-  //   fetchLessons(courseId, (lessons) => {
-  //     displayLessons(lessons);
-  //   });
-  // });
+// 🔹 الانتقال إلى صفحة الشهادة بعد إنهاء جميع الدروس
+function redirectToCertificate(studentId, courseId) {
+  window.location.href = `certificate.html?studentId=${studentId}&courseId=${courseId}`;
+}
 
-  // // Attach event listeners to buttons
-  // document.getElementById("prev-button").addEventListener("click", prevVideo);
-  // document.getElementById("next-button").addEventListener("click", nextVideo);
-});
+// 🔹 التنقل بين الفيديوهات (السابق والتالي)
+function changeVideo(direction) {
+  const currentLesson = document.querySelector(".course-item.current");
+  if (!currentLesson) return;
+
+  const newLesson =
+    direction === "prev"
+      ? currentLesson.previousElementSibling
+      : currentLesson.nextElementSibling;
+
+  if (newLesson) {
+    loadLesson({
+      videoUrl: newLesson.dataset.videoUrl,
+      description: newLesson.dataset.description,
+    });
+
+    currentLesson.classList.remove("current");
+    newLesson.classList.add("current");
+  }
+}
+
+function prevVideo() {
+  changeVideo("prev");
+}
+
+function nextVideo() {
+  changeVideo("next");
+}
+
+// 🔹 تسجيل الأحداث (Event Listeners)
+function attachEventListeners() {
+  document.getElementById("prev-button").addEventListener("click", prevVideo);
+  document.getElementById("next-button").addEventListener("click", nextVideo);
+}
