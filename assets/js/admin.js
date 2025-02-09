@@ -346,7 +346,7 @@ function addCourse() {
           duration,
           image // إضافة الصورة إلى البيانات
       };
-
+        newCourse.id = newCourseRef.key;
       coursesRef.push(newCourse)
           .then(() => {
               alert("Course added successfully!");
