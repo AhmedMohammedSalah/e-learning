@@ -211,30 +211,27 @@ async function enrollStudent(studentId, courseId) {
 
 // Update the event listener in addEventListenersToButtons
 
-
 function getStudentCourseData(studentId, courseId) {
-  try {
-    const studentCourseRef = database.ref(
-      `students-courses/${studentId}_${courseId}`
-    );
-    studentCourseRef
-      .once("value", (snapshot) => {
-        if (snapshot.exists()) {
-          const data = snapshot.val();
-          return data;
-        } else {
-          console.log(
-            `Student ${studentId} is not enrolled in course ${courseId}`
-          );
-        }
-      })
-      .catch((error) => {
-        console.error("Error fetching student course status:", error);
-      });
-  } catch (error) {
-    console.error("Error fetching student course status:", error);
-    throw error;
-  }
+  return database
+    .ref(`students-courses/${studentId}_${courseId}`)
+    .once("value")
+    .then((snapshot) => {
+      if ( snapshot.exists() ) {
+        console.log("Data retreved ");
+        
+        return snapshot.val();
+      } else {
+        console.log(
+          `Student ${studentId} is not enrolled in course ${courseId}`
+        );
+
+        return null;
+      }
+    })
+    .catch((error) => {
+      console.error("Error fetching student course status:", error);
+      throw error;
+    });
 }
 
 function myCourses(studentId, callback) {

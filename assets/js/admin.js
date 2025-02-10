@@ -858,43 +858,64 @@ document.addEventListener("DOMContentLoaded", () => {
 //   });
 // }
 
-function fetchStudentProgress() {
-  const progressTable = document.getElementById("progressTableBody"); // تأكد من وجود tbody لعرض البيانات
-  progressTable.innerHTML = ""; // مسح البيانات القديمة قبل التحديث
+async function fetchStudentProgress() {
+  const progressTable = document.getElementById("progressTableBody");
+  progressTable.innerHTML = "";
 
-  database.ref("students-courses").once("value", (snapshot) => {
-    console.log("Student progress data:", snapshot.val());
+  database.ref("students-courses").once("value", async (snapshot) => {
     const data = snapshot.val();
-    let hasApprovedStudents = false; // للتحقق مما إذا كان هناك طلاب مقبولون
+    let hasApprovedStudents = false;
 
     if (data) {
-      Object.keys(data).forEach((key) => {
-        const { progress, status } = data[key]; // استخراج البيانات
-        const [studentId, courseId] = key.split("_"); // استخراج الـ studentId و courseId
+      for (const key of Object.keys(data)) {
+        const { progress, status } = data[key];
+        const [studentId, courseId] = key.split("_");
+        const courseFullData = await new Promise((resolve) => {
+          fetchCourseById(courseId, (course) => {
+            resolve(course);
+          });
+        });
         if (status === "enrolled") {
           hasApprovedStudents = true;
-          let alldata = getStudentCourseData(studentId, courseId);
-          console.log(alldata);
-          
+          const alldata = await getStudentCourseData(studentId, courseId);
+
+          const rating = alldata?.review?.rating || 0;
+          const comment = alldata?.review?.comment || "No comments";
+
+          const starIcons = generateStars(rating);
+
           const row = `
             <tr>
               <td>${studentId}</td>
-              <td>${courseId}</td>
-              <td>${progress}%</td>
+              <td>${courseFullData.title}</td>
               <td>
-                
+                <div style="position: relative; width: 100px; background: #eee; border-radius: 5px;">
+                  <div style="width: ${progress}%; background: green; height: 10px; border-radius: 5px;"></div>
+                  <span style="position: absolute; top: -5px; left: 50%; transform: translateX(-50%); font-size: 12px;">
+                    ${progress}%
+                  </span>
+                </div>
               </td>
+              <td style="color:#ffc107;">${starIcons}</td>
+              <td>${comment}</td>
             </tr>
           `;
-          progressTable.innerHTML += row; // إضافة الصف إلى الجدول
+
+          progressTable.innerHTML += row;
         }
-      });
+      }
     }
 
     if (!hasApprovedStudents) {
-      progressTable.innerHTML = `<tr><td colspan="4">No enrolled students yet.</td></tr>`;
+      progressTable.innerHTML = `<tr><td colspan="5">No enrolled students yet.</td></tr>`;
     }
   });
+}
+
+function generateStars(rating) {
+  const filledStar = "★";
+  const emptyStar = "☆";
+  return filledStar.repeat(rating) + emptyStar.repeat(5 - rating);
 }
 
 // function fetchStudentProgress() {
