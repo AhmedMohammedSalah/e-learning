@@ -28,7 +28,7 @@
         <section id="dashboard" class="section">
             <h2>Lessons Section</h2>
             <button class="add-btn" onclick="openAddLessonForm()">+ Add Lesson</button>
-            
+
             <table>
                 <thead>
                     <tr>
@@ -40,30 +40,30 @@
                 </thead>
                 <tbody id="lessons-table-body"></tbody>
             </table>
-        
+
             <!-- نموذج إضافة درس -->
             <div id="lessonForm" class="form-popup" style="display: none;">
                 <div class="form-container">
                     <h2>Add New Lesson</h2>
-                    
+
                     <label for="lesson-course">Select Course:</label>
                     <select id="lesson-course"></select>
-        
+
                     <label>Lesson Title:</label>
                     <input type="text" id="lesson-title" placeholder="Enter lesson title">
-        
+
                     <label>Video URL:</label>
                     <input type="text" id="lesson-video-url" placeholder="Enter video URL">
-        
+
                     <label>Description:</label>
                     <textarea id="lesson-desc" placeholder="Enter lesson description"></textarea>
-        
+
                     <button class="submit-btn" onclick="addLesson()">Save</button>
                     <button class="close-btn" onclick="closeForm('lessonForm')">Close</button>
                 </div>
             </div>
         </section>
-        
+
 
         <!-- Courses Section -->
         <section id="courses" class="section">
@@ -81,7 +81,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                 
+
                 </tbody>
             </table>
         </section>
@@ -98,7 +98,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    
+
                 </tbody>
             </table>
         </section>
@@ -106,17 +106,17 @@
         <!-- Students Section -->
         <section id="students" class="section">
             <h2>Student Progress</h2>
-            <table>
+            <table id="progressTable">
                 <thead>
                     <tr>
-                        <th>Student Name</th>
-                        <th>Course</th>
+                        <th>Student ID</th>
+                        <th>Course ID</th>
                         <th>Progress</th>
+                        <th>Feedback rate</th>
+                        <th>Feedback Comment</th>
                     </tr>
                 </thead>
-                <tbody>
-                   
-                </tbody>
+                <tbody id="progressTableBody"></tbody>
             </table>
         </section>
 
@@ -134,11 +134,13 @@
                         <th>Student ID</th>
                         <th>Course ID</th>
                         <th>Status</th>
+                        <th>payment status </th>
+
                         <th>Actions</th>
                     </tr>
                 </thead>
 
-                  <tbody id="requests-table-body">
+                <tbody id="requests-table-body">
                 </tbody>
             </table>
         </section>
@@ -157,7 +159,7 @@
 
             <label>Category:</label>
             <select id="course-category">
-              
+
             </select>
 
             <label>Instructor Name:</label>
@@ -183,7 +185,7 @@
     <div id="editCourseForm" class="form-popup">
         <div class="form-container">
             <h2>Edit Course</h2>
-            
+
 
             <label>Title:</label>
             <input type="text" id="edit-course-title">
@@ -240,23 +242,23 @@
     </div>
 
     <!-- Add Lesson Form -->
-   
-<div id="editLessonForm" class="form-popup">
-    <div class="form-container">
-        <h2>Edit Lesson</h2>
-        <label>Lesson Title:</label>
-        <input type="text" id="edit-lesson-title" placeholder="Enter lesson title">
 
-        <label>Video URL:</label>
-        <input type="text" id="edit-lesson-video-url" placeholder="Enter video URL">
+    <div id="editLessonForm" class="form-popup">
+        <div class="form-container">
+            <h2>Edit Lesson</h2>
+            <label>Lesson Title:</label>
+            <input type="text" id="edit-lesson-title" placeholder="Enter lesson title">
 
-        <label>Description:</label>
-        <textarea id="edit-lesson-desc" placeholder="Enter lesson description"></textarea>
+            <label>Video URL:</label>
+            <input type="text" id="edit-lesson-video-url" placeholder="Enter video URL">
 
-        <button class="submit-btn" onclick="editLesson()">Update</button>
-        <button class="close-btn" onclick="closeForm('editLessonForm')">Close</button>
+            <label>Description:</label>
+            <textarea id="edit-lesson-desc" placeholder="Enter lesson description"></textarea>
+
+            <button class="submit-btn" onclick="editLesson()">Update</button>
+            <button class="close-btn" onclick="closeForm('editLessonForm')">Close</button>
+        </div>
     </div>
-</div>
 
     </div>
 
@@ -267,6 +269,7 @@
 
     <!-- JavaScript Code -->
     <script src="./firebase/config.js"></script>
+    <script src="./assets/js/courses.js"></script>
     <script src="./assets/js/admin.js"></script>
 </body>
 

@@ -137,100 +137,82 @@ function addLesson(courseId, lessonData, onSuccess, onError) {
   }
 }
 
-function enrollStudent(studentId, courseId) {
-  try {
+async function checkEnrollmentStatus(studentId, courseId) {
+  return new Promise((resolve, reject) => {
     const studentCourseRef = database.ref(
       `students-courses/${studentId}_${courseId}`
     );
     studentCourseRef
-      .set({
-        student_id: studentId,
-        course_id: courseId,
-        status: "pending",
-        progress: 0,
-      })
-      .then(() => {
-        console.log(
-          `Student ${studentId} requested to enroll in course ${courseId}`
-        );
+      .once("value")
+      .then((snapshot) => {
+        if (snapshot.exists()) {
+          resolve(snapshot.val().status);
+        } else {
+          resolve(null);
+        }
       })
       .catch((error) => {
-        console.error("Error enrolling student:", error);
+        reject(error);
       });
-  } catch (error) {
-    console.error("Error enrolling student:", error);
-    throw error;
-  }
+  });
 }
 
 async function enrollStudent(studentId, courseId) {
   try {
-    const studentCourseRef = database.ref(
-      `students-courses/${studentId}_${courseId}`
-    );
+    const enrollmentStatus = await checkEnrollmentStatus(studentId, courseId);
 
-    // Check if the enrollment record already exists
-    const snapshot = await studentCourseRef.once("value");
+    if (enrollmentStatus === "enrolled") {
+      alert("You are already enrolled in this course!");
+      return;
+    }
 
-    if (snapshot.exists()) {
-      const enrollmentData = snapshot.val();
-
-      if (enrollmentData.status === "enrolled") {
-        alert("You are already enrolled in this course!");
-      } else if (enrollmentData.status === "pending") {
-        alert(
-          "Your enrollment request is already sent. Please wait for approval."
-        );
+    fetchLessons(courseId, (lessons) => {
+      if (!lessons) {
+        console.error("No lessons found for this course!");
+        return;
       }
-    } else {
-      await studentCourseRef.set({
-        student_id: studentId,
-        course_id: courseId,
-        status: "pending",
-        progress: 0,
+
+      const watched = {};
+      Object.keys(lessons).forEach((lessonId) => {
+        watched[lessonId] = false;
       });
 
-      console.log(
-        `Student ${studentId} requested to enroll in course ${courseId}`
+      const studentCourseRef = database.ref(
+        `students-courses/${studentId}_${courseId}`
       );
-      alert("Enrollment request sent successfully!");
-    }
+
+      studentCourseRef
+        .set({
+          student_id: studentId,
+          course_id: courseId,
+          status: "pending",
+          progress: 0,
+          payed: false,
+          watched,
+        })
+        .then(() => {
+          console.log(
+            `Student ${studentId} requested to enroll in course ${courseId}`
+          );
+          alert("Enrollment request sent!");
+          window.location.href = `payment.html?id=${courseId}`;
+        })
+        .catch((error) => {
+          console.error("Error enrolling student:", error);
+          alert("Error while enrolling. Please try again.");
+        });
+    });
   } catch (error) {
     console.error("Error enrolling student:", error);
-    alert("An error occurred while processing your request. Please try again.");
+    alert("Error while enrolling. Please try again.");
     throw error;
   }
 }
 
-function updateProgress(studentId, courseId, completedLessons, totalLessons) {
-  try {
-    if (totalLessons === 0) {
-      throw new Error("Total lessons cannot be zero.");
-    }
+// Update the event listener in addEventListenersToButtons
 
-    const progress = Math.round((completedLessons / totalLessons) * 100);
-    const studentCourseRef = database.ref(
-      `students-courses/${studentId}_${courseId}`
-    );
-    studentCourseRef
-      .update({
-        progress: progress,
-      })
-      .then(() => {
-        console.log(
-          `Progress updated to ${progress}% for student ${studentId} in course ${courseId}`
-        );
-      })
-      .catch((error) => {
-        console.error("Error updating progress:", error);
-      });
-  } catch (error) {
-    console.error("Error updating progress:", error);
-    throw error;
-  }
-}
 
-function getStudentCourseStatus(studentId, courseId) {
+function getStudentCourseData(studentId, courseId) {
   try {
     const studentCourseRef = database.ref(
       `students-courses/${studentId}_${courseId}`
@@ -239,9 +221,7 @@ function getStudentCourseStatus(studentId, courseId) {
       .once("value", (snapshot) => {
         if (snapshot.exists()) {
           const data = snapshot.val();
-          console.log(
-            `Student ${studentId} is ${data.status} in course ${courseId}, progress: ${data.progress}%`
-          );
+          return data;
         } else {
           console.log(
             `Student ${studentId} is not enrolled in course ${courseId}`

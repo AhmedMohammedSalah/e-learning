@@ -26,16 +26,29 @@ document.addEventListener("DOMContentLoaded", function () {
       console.log(wishlist);
 
       const courseArray = Object.entries(allCourses || {}).map(
-        ([id, course]) => ({
-          ...course,
-          id,
-          isEnrolled: enrolledCourses.some(
-            (enrolled) => enrolled.course_id === id
-          ),
-          isInWishlist: wishlist.some(
-            (wishlistCourse) => wishlistCourse.id === id
-          ),
-        })
+        ([id, course]) => {
+          let isEnrolled = false;
+          let isInWishlist = false;
+          for (const enrolled of enrolledCourses) {
+            if (enrolled.course_id === id) {
+              isEnrolled = true;
+              break;
+            }
+          }
+          for (const wishlistCourse of wishlist) {
+            if (wishlistCourse.id === id) {
+              isInWishlist = true;
+              break;
+            }
+          }
+
+          return {
+            ...course,
+            id,
+            isEnrolled,
+            isInWishlist,
+          };
+        }
       );
 
       renderCourses("#all-courses .courses-container", courseArray);
@@ -126,6 +139,7 @@ document.addEventListener("DOMContentLoaded", function () {
           isMyCourses || course.isEnrolled
             ? `<button class="continue-btn" data-id="${course.id}">Continue Course</button>`
             : `
+              <p>${isMyCourses}:${course.isEnrolled}</p>
               <button class="enroll-btn" data-id="${course.id}">Enroll Now</button>
               <button class="viewcourse-btn" data-id="${course.id}">View Course</button>
             <button class="remove-wishlist-btn" data-id="${course.id}">Remove from Wishlist</button>
@@ -186,15 +200,28 @@ document.addEventListener("DOMContentLoaded", function () {
   function updateCoursesContainer(filteredCourses) {
     myCourses(studentId, (enrolledCourses) => {
       fetchWishlist((wishlist) => {
-        const courses = filteredCourses.map((course) => ({
-          ...course,
-          isEnrolled: enrolledCourses.some(
-            (enrolled) => enrolled.id === course.id
-          ),
-          isInWishlist: wishlist.some(
-            (wishlistCourse) => wishlistCourse.id === course.id
-          ),
-        }));
+        const courses = filteredCourses.map((course) => {
+          let isEnrolled = false;
+          let isInWishlist = false;
+          for (const enrolled of enrolledCourses) {
+            if (enrolled.id === course.id) {
+              isEnrolled = true;
+              break;
+            }
+          }
+          for (const wishlistCourse of wishlist) {
+            if (wishlistCourse.id === course.id) {
+              isInWishlist = true;
+              break;
+            }
+          }
+
+          return {
+            ...course,
+            isEnrolled,
+            isInWishlist,
+          };
+        });
 
         renderCourses("#all-courses .courses-container", courses);
       });
@@ -202,13 +229,27 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function addEventListenersToButtons() {
-    document.querySelectorAll(".enroll-btn").forEach((btn) =>
-      btn.addEventListener("click", function () {
-        enrollStudent(studentId, this.dataset.id);
-        alert("Enrollment request sent!");
-        loadAllCourses();
-      })
-    );
+document.querySelectorAll(".enroll-btn").forEach((btn) =>
+  btn.addEventListener("click", async function () {
+    try {
+      const enrollmentStatus = await checkEnrollmentStatus(
+        studentId,
+        this.dataset.id
+      );
+
+      if (enrollmentStatus === "enrolled") {
+        alert("You are already enrolled in this course!");
+        return;
+      }
+      await enrollStudent(studentId, this.dataset.id);
+      alert("Enrollment request sent!");
+      window.location.href = `payment.html?id=${this.dataset.id}`;
+    } catch (error) {
+      console.error("Error during enrollment:", error);
+      alert("Error during enrollment. Please try again.");
+    }
+  })
+);
 
     document.querySelectorAll(".wishlist-btn").forEach((btn) =>
       btn.addEventListener("click", function () {
@@ -238,12 +279,10 @@ document.addEventListener("DOMContentLoaded", function () {
       })
     );
   }
-  document
-    .getElementById("logout")
-    .addEventListener("click", function () {
-      Storage.removeLocalData("userData");
-      Storage.removeLocalData("whichlist");
-    });
+  document.getElementById("logout").addEventListener("click", function () {
+    Storage.removeLocalData("userData");
+    // Storage.removeLocalData("whichlist");
+  });
   document
     .getElementById("search-courses")
     .addEventListener("input", handleSearch);

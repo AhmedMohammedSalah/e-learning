@@ -677,19 +677,33 @@ function loadPendingRequests() {
     .once("value")
     .then((snapshot) => {
       console.log("Fetched pending requests:", snapshot.val());
-      requestsTable.innerHTML = ""; // تنظيف الجدول قبل إعادة تعبئته
+      requestsTable.innerHTML = "";
 
       if (snapshot.exists()) {
-        snapshot.forEach((childSnapshot) => {
+        snapshot.forEach(async (childSnapshot) => {
           const data = childSnapshot.val();
+          const courseData = await new Promise((resolve) => {
+            fetchCourseById(data.course_id, (course) => {
+              resolve(course);
+            });
+          });
           const row = `
                       <tr>
                           <td>${data.student_id}</td>
-                          <td>${data.course_id}</td>
+                          <td>${courseData.title}</td>
                           <td>${data.status}</td>
+                          <td>${
+                            data.payed
+                              ? "student purchassed"
+                              : "student will purchase "
+                          }</td>
                           <td>
-                              <button class="accept-btn" onclick="approveEnrollment('${data.student_id}', '${data.course_id}')">Accept</button>
-                              <button class="reject-btn" onclick="rejectEnrollment('${data.student_id}', '${data.course_id}')">Reject</button>
+                              <button class="accept-btn" onclick="approveEnrollment('${
+                                data.student_id
+                              }', '${data.course_id}')">Accept</button>
+                              <button class="reject-btn" onclick="rejectEnrollment('${
+                                data.student_id
+                              }', '${data.course_id}')">Reject</button>
                           </td>
                       </tr>
                   `;
@@ -705,16 +719,41 @@ function loadPendingRequests() {
     });
 }
 
+// function approveEnrollment(studentId, courseId) {
+//   try {
+//     const studentCourseRef = database.ref(
+//       `students-courses/${studentId}_${courseId}`
+//     );
+
+//     studentCourseRef
+//       .update({
+//         status: "enrolled",
+//         progress: 0,
+//       })
+//       .then(() => {
+//         alert(`Student ${studentId} has been enrolled in course ${courseId}`);
+//         loadPendingRequests(); // تحديث الطلبات بعد الموافقة
+//       })
+//       .catch((error) => {
+//         console.error("Error approving enrollment:", error);
+//       });
+//   } catch (error) {
+//     console.error("Error approving enrollment:", error);
+//   }
+// }
 function approveEnrollment(studentId, courseId) {
   try {
     const studentCourseRef = database.ref(
       `students-courses/${studentId}_${courseId}`
     );
+    console.log(
+      `Approving enrollment for Student ID: ${studentId}, Course ID: ${courseId}`
+    );
 
     studentCourseRef
       .update({
         status: "enrolled",
-        progress: 0,
+        progress: 0, // التقدم يبدأ من 0
       })
       .then(() => {
         alert(`Student ${studentId} has been enrolled in course ${courseId}`);
@@ -733,6 +772,9 @@ function rejectEnrollment(studentId, courseId) {
     const studentCourseRef = database.ref(
       `students-courses/${studentId}_${courseId}`
     );
+    console.log(
+      `Rejecting enrollment for Student ID: ${studentId}, Course ID: ${courseId}`
+    );
 
     studentCourseRef
       .remove()
@@ -748,63 +790,182 @@ function rejectEnrollment(studentId, courseId) {
   }
 }
 
-// جلب الطلبات pending
-// function loadPendingRequests() {
-//   const requestsTable = document.getElementById("requests-table-body");
-//   database.ref("students-courses").orderByChild("status").equalTo("pending").once("value", snapshot => {
-//       requestsTable.innerHTML = "";  // تنظيف الجدول قبل إعادة تعبئته
-//       snapshot.forEach(childSnapshot => {
-//           const data = childSnapshot.val();
-//           const row = `
-//               <tr>
-//                   <td>${data.student_id}</td>
-//                   <td>${data.course_id}</td>
-//                   <td>${data.status}</td>
-//                   <td>
-//                       <button onclick="approveEnrollment('${data.student_id}', '${data.course_id}')">Accept</button>
-//                       <button onclick="rejectEnrollment('${data.student_id}', '${data.course_id}')">Reject</button>
-//                   </td>
-//               </tr>
-//           `;
-//           requestsTable.innerHTML += row;
+function updateStudentProgress(studentId, courseId, progress) {
+  const studentCourseRef = database.ref(
+    `students-courses/${studentId}_${courseId}`
+  );
+  console.log(
+    `Updating progress for Student ID: ${studentId}, Course ID: ${courseId}, Progress: ${progress}%`
+  );
+
+  studentCourseRef
+    .update({
+      progress: progress,
+    })
+    .then(() => {
+      console.log(
+        `Progress updated for student ${studentId} in course ${courseId}`
+      );
+    })
+    .catch((error) => {
+      console.error("Error updating progress:", error);
+    });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("Page loaded, fetching data...");
+  fetchCourses();
+  fetchCategories();
+
+  // التأكد من أن الدالة موجودة قبل استدعائها
+  if (typeof fetchStudentProgress === "function") {
+    fetchStudentProgress();
+  } else {
+    console.error("Error: fetchStudentProgress is not defined!");
+  }
+});
+
+// function fetchStudentProgress() {
+//   const progressTable = document.getElementById("progressTableBody"); // تأكد من وجود tbody لعرض البيانات
+//   progressTable.innerHTML = ""; // مسح البيانات القديمة قبل التحديث
+
+//   database.ref("students-courses").once("value", (snapshot) => {
+//     console.log("📌 Student progress data:", snapshot.val()); // ✅ عرض البيانات في الكونسول للتأكد
+
+//     const data = snapshot.val();
+//     if (data) {
+//       Object.keys(data).forEach((key) => {
+//         const { progress, status } = data[key]; // استخراج البيانات
+//         const [studentId, courseId] = key.split("_"); // استخراج الـ studentId و courseId
+
+//         // ✅ إنشاء صف لكل طالب في الجدول
+//         const row = `
+//           <tr>
+//             <td>${studentId}</td>
+//             <td>${courseId}</td>
+
+//             <td>${progress}%</td>
+//             <td>
+//               <button onclick="updateStudentProgress('${studentId}', '${courseId}', 50)">Update to 50%</button>
+//             </td>
+//           </tr>
+//         `;
+//         progressTable.innerHTML += row; // إضافة الصف إلى الجدول
 //       });
+//     } else {
+//       progressTable.innerHTML = `<tr><td colspan="5">No student progress data available.</td></tr>`;
+//     }
 //   });
 // }
-// // في حاله الموافقه
-// function approveEnrollment(studentId, courseId) {
-//   try {
-//       const studentCourseRef = database.ref(`students-courses/${studentId}_${courseId}`);
 
-//       studentCourseRef.update({
-//           status: "enrolled",
-//           progress: 0
-//       })
-//       .then(() => {
-//           alert(`Student ${studentId} has been enrolled in course ${courseId}`);
-//       })
-//       .catch((error) => {
-//           console.error("Error approving enrollment:", error);
-//       });
-//   } catch (error) {
-//       console.error("Error approving enrollment:", error);
-//   }
-// }
-// //reject
-// function rejectEnrollment(studentId, courseId) {
-//   try {
-//       const studentCourseRef = database.ref(`students-courses/${studentId}_${courseId}`);
+function fetchStudentProgress() {
+  const progressTable = document.getElementById("progressTableBody"); // تأكد من وجود tbody لعرض البيانات
+  progressTable.innerHTML = ""; // مسح البيانات القديمة قبل التحديث
 
-//       studentCourseRef.remove()
-//       .then(() => {
-//           alert(`Enrollment request for student ${studentId} has been removed.`);
-//       })
-//       .catch((error) => {
-//           console.error("Error rejecting enrollment:", error);
-//       });
-//   } catch (error) {
-//       console.error("Error rejecting enrollment:", error);
-//   }
+  database.ref("students-courses").once("value", (snapshot) => {
+    console.log("Student progress data:", snapshot.val());
+    const data = snapshot.val();
+    let hasApprovedStudents = false; // للتحقق مما إذا كان هناك طلاب مقبولون
+
+    if (data) {
+      Object.keys(data).forEach((key) => {
+        const { progress, status } = data[key]; // استخراج البيانات
+        const [studentId, courseId] = key.split("_"); // استخراج الـ studentId و courseId
+        if (status === "enrolled") {
+          hasApprovedStudents = true;
+          let alldata = getStudentCourseData(studentId, courseId);
+          console.log(alldata);
+          
+          const row = `
+            <tr>
+              <td>${studentId}</td>
+              <td>${courseId}</td>
+              <td>${progress}%</td>
+              <td>
+                
+              </td>
+            </tr>
+          `;
+          progressTable.innerHTML += row; // إضافة الصف إلى الجدول
+        }
+      });
+    }
+
+    if (!hasApprovedStudents) {
+      progressTable.innerHTML = `<tr><td colspan="4">No enrolled students yet.</td></tr>`;
+    }
+  });
+}
+
+// function fetchStudentProgress() {
+//   const coursesRef = database.ref("courses");
+//   const tableBody = document.getElementById("progressTableBody");
+//   tableBody.innerHTML = "";
+
+//   coursesRef.once("value", (snapshot) => {
+//       if (snapshot.exists()) {
+//           const courses = snapshot.val();
+//           Object.keys(courses).forEach((courseId) => {
+//               const course = courses[courseId];
+//               if (course.students) {
+//                   Object.keys(course.students).forEach((studentId) => {
+//                       const student = course.students[studentId];
+
+//                       // حساب نسبة التقدم
+//                       const progressPercentage = ((student.completedVideos / course.totalVideos) * 100).toFixed(1);
+
+//                       // إنشاء صف في الجدول
+//                       const row = document.createElement("tr");
+//                       row.innerHTML = `
+//                           <td>${student.name}</td>
+//                           <td>${course.title}</td>
+//                           <td>
+//                               <div class="progress-container">
+//                                   <div class="progress-bar" style="width: ${progressPercentage}%;">
+//                                       <span class="progress-text">${progressPercentage}%</span>
+//                                   </div>
+//                               </div>
+//                               <small>${student.completedVideos} / ${course.totalVideos} Videos</small>
+//                           </td>
+//                       `;
+//                       tableBody.appendChild(row);
+//                   });
+//               }
+//           });
+//       }
+//   });
 // }
+
+// document.addEventListener("DOMContentLoaded", function () {
+//   const database = firebase.database();
+
+//   const dummyData = {
+//       courses: {
+//           course1: {
+//               title: "JavaScript Basics",
+//               totalVideos: 10,
+//               students: {
+//                   student1: { name: "Ahmed Ali", completedVideos: 5 },
+//                   student2: { name: "Sara Mohamed", completedVideos: 8 }
+//               }
+//           },
+//           course2: {
+//               title: "Python for Beginners",
+//               totalVideos: 15,
+//               students: {
+//                   student3: { name: "Mohamed Tarek", completedVideos: 12 },
+//                   student4: { name: "Nour El-Din", completedVideos: 3 }
+//               }
+//           }
+//       }
+//   };
+
+//   database.ref().set(dummyData)
+//       .then(() => console.log("✅ Dummy data added successfully"))
+//       .catch((error) => console.error("❌ Error adding dummy data:", error));
+// });
+
+// تحميل البيانات عند فتح الصفحة
 
 // تحميل البيانات عند فتح الصفحة
 document.addEventListener("DOMContentLoaded", () => {

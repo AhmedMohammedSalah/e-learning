@@ -175,7 +175,44 @@
             text-align: center;
             color: #003b4d;
         }
+        .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    }
+
+    .modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    }
+
+    .modal form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    }
+
+    .modal textarea {
+    width: 100%;
+    padding: 8px;
+    }
+
+    .form-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    }
     </style>
+
 </head>
 
 <body>
@@ -217,11 +254,15 @@
             </div>
 
             <div class="buttons">
-                <button id="prev-button" onclick="prevVideo()">Previous</button>
-                <button id="next-button" onclick="nextVideo()">Next</button>
-                <button id="certificate-button" style="display: none;" onclick="redirectToCertificate()">Get
-                    Certificate</button>
+                <button id="prev-button">Previous</button>
+                <button id="next-button">Next</button>
             </div>
+            <br/>
+            <div class="buttons">
+                <button id="certificate-button" style="display: none;">GetCertificate</button></div>
+            <div class="buttons">
+                <button id="review-button">Review Course</button>
+                </div>
         </div>
     </div>
 <script src="https://www.gstatic.com/firebasejs/8.6.7/firebase-app.js"></script>
