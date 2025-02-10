@@ -21,7 +21,7 @@ function initCoursePage() {
     return;
   }
 
-  fetchCourseById(courseId, (course) => {
+  fetchCourseById( courseId,( course ) => {
     displayCourseData(course);
     fetchLessons(courseId, (lessons) => {
       lessonsList = Object.entries(lessons).map(([id, lesson]) => ({

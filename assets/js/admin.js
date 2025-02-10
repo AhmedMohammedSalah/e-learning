@@ -1,17 +1,14 @@
-// دالة لفتح النماذج
 function openForm(formId) {
   document.getElementById(formId).style.display = "block";
 }
 
-// دالة لإغلاق النماذج
 function closeForm(formId) {
   document.getElementById(formId).style.display = "none";
 }
 
-// دالة لفتح نموذج إضافة درس
 function openAddLessonForm() {
   const courseSelect = document.getElementById("lesson-course");
-  courseSelect.innerHTML = ""; // مسح الخيارات القديمة
+  courseSelect.innerHTML = "";
 
   const coursesRef = database.ref("courses");
   coursesRef.once("value", (snapshot) => {
@@ -26,60 +23,16 @@ function openAddLessonForm() {
     }
   });
 
-  openForm("lessonForm"); // Use the correct ID here
+  openForm("lessonForm");
 }
 function openForm(formId) {
   const form = document.getElementById(formId);
   if (form) {
-    form.style.display = "block"; // Show the form
+    form.style.display = "block";
   } else {
     console.error(`Form with ID "${formId}" not found.`);
   }
 }
-
-// دالة لإضافة درس جديد
-
-// function addLesson() {
-//   const courseId = document.getElementById("lesson-course").value;
-//   const title = document.getElementById("lesson-title").value;
-//   const videoUrl = document.getElementById("lesson-video-url").value;
-//   const description = document.getElementById("lesson-desc").value;
-
-//   if (!courseId || !title || !videoUrl || !description) {
-//       alert("Please fill all fields!");
-//       return;
-//   }
-
-//   const lessonsRef = database.ref(`courses/${courseId}/lessons`);
-
-//   // التحقق من عدم وجود نفس الدرس مسبقًا
-//   lessonsRef.once("value", (snapshot) => {
-//       const lessons = snapshot.val();
-//       let isDuplicate = false;
-
-//       if (lessons) {
-//           Object.values(lessons).forEach((lesson) => {
-//               if (lesson.title === title || lesson.videoUrl === videoUrl) {
-//                   isDuplicate = true;
-//               }
-//           });
-//       }
-
-//       if (isDuplicate) {
-//           alert("Lesson with the same title or video URL already exists!");
-//       } else {
-//           const lesson = { title, videoUrl, description };
-//           lessonsRef.push(lesson)
-//               .then(() => {
-//                   alert("Lesson added successfully!");
-//                   closeForm("addLessonForm");
-//               })
-//               .catch((error) => {
-//                   alert("Error adding lesson: " + error.message);
-//               });
-//       }
-//   });
-// }
 
 function addLesson() {
   const courseId = document.getElementById("lesson-course").value;
@@ -94,7 +47,6 @@ function addLesson() {
 
   const lessonsRef = database.ref(`courses/${courseId}/lessons`);
 
-  // التحقق من عدم وجود نفس الدرس مسبقًا
   lessonsRef.once("value", (snapshot) => {
     const lessons = snapshot.val();
     let isDuplicate = false;
@@ -116,7 +68,7 @@ function addLesson() {
         .then(() => {
           alert("Lesson added successfully!");
           closeForm("lessonForm");
-          fetchLessons(); // تحديث الجدول مباشرة بعد الإضافة
+          fetchLessons();
         })
         .catch((error) => {
           alert("Error adding lesson: " + error.message);
@@ -125,11 +77,10 @@ function addLesson() {
   });
 }
 
-// دالة لجلب الدروس وعرضها في الجدول
 function fetchLessons(courseId) {
   const lessonsRef = database.ref(`courses/${courseId}/lessons`);
   const tbody = document.querySelector("#lessons tbody");
-  tbody.innerHTML = ""; // مسح المحتوى القديم
+  tbody.innerHTML = "";
 
   lessonsRef.once("value", (snapshot) => {
     const lessons = snapshot.val();
@@ -154,7 +105,6 @@ function fetchLessons(courseId) {
   });
 }
 
-// دالة لفتح نموذج تعديل الدرس
 function openEditLessonForm(courseId, lessonId) {
   const lessonRef = database.ref(`courses/${courseId}/lessons/${lessonId}`);
 
@@ -172,7 +122,6 @@ function openEditLessonForm(courseId, lessonId) {
   });
 }
 
-// دالة لتحديث بيانات الدرس
 function editLesson(courseId, lessonId) {
   const title = document.getElementById("edit-lesson-title").value;
   const videoUrl = document.getElementById("edit-lesson-video-url").value;
@@ -220,7 +169,6 @@ function editLesson(courseId, lessonId) {
   });
 }
 
-// دالة لحذف الدرس
 function deleteLesson(courseId, lessonId) {
   if (confirm("Are you sure you want to delete this lesson?")) {
     database
@@ -228,17 +176,17 @@ function deleteLesson(courseId, lessonId) {
       .remove()
       .then(() => {
         alert("Lesson deleted successfully!");
-        fetchLessons(courseId); // تحديث الجدول بعد الحذف
+        fetchLessons(courseId);
       })
       .catch((error) => {
         alert("Error deleting lesson: " + error.message);
       });
   }
 }
-// دالة لجلب الدروس وعرضها في الجدول مع عناوين الكورسات
+
 function fetchLessons() {
   const lessonsTable = document.getElementById("lessons-table-body");
-  lessonsTable.innerHTML = ""; // تفريغ الجدول قبل تعبئته مجددًا
+  lessonsTable.innerHTML = "";
 
   const coursesRef = database.ref("courses");
   coursesRef.once("value", (coursesSnapshot) => {
@@ -274,52 +222,21 @@ function fetchLessons() {
   });
 }
 
-// تحميل الدروس تلقائيًا عند فتح الصفحة
 document.addEventListener("DOMContentLoaded", () => {
+  const student = Storage.fetchLocalData("userData");
+
+  const adminEmail = "admin@gmail.com";
+  const adminPassword = "admin123";
+  if (
+    !student ||
+    student["email"] == adminEmail ||
+    student["email"] == adminPassword
+  ) {
+    window.location.href = "login.html";
+    return;
+  }
   fetchLessons();
 });
-
-// دالة لإضافة كورس جديد
-// function addCourse() {
-//   const title = document.getElementById("course-title").value;
-//   const category = document.getElementById("course-category").value;
-//   const instructor = document.getElementById("instructor-name").value;
-//   const description = document.getElementById("course-desc").value;
-//   const price = document.getElementById("course-price").value;
-//   const duration = document.getElementById("course-duration").value;
-
-//   if (!title || !category || !instructor || !description || !price || !duration) {
-//       alert("Please fill all fields!");
-//       return;
-//   }
-
-//   const coursesRef = database.ref("courses");
-//   coursesRef.orderByChild("title").equalTo(title).once("value", (snapshot) => {
-//       if (snapshot.exists()) {
-//           alert("Course with this title already exists!");
-//           return;
-//       }
-
-//       const newCourse = {
-//           title,
-//           category,
-//           instructor,
-//           description,
-//           price,
-//           duration
-//       };
-
-//       coursesRef.push(newCourse)
-//           .then(() => {
-//               alert("Course added successfully!");
-//               closeForm("courseForm");
-//               fetchCourses(); // تحديث الجدول بعد الإضافة
-//           })
-//           .catch((error) => {
-//               alert("Error adding course: " + error.message);
-//           });
-//   });
-// }
 
 function addCourse() {
   const title = document.getElementById("course-title").value;
@@ -328,9 +245,8 @@ function addCourse() {
   const description = document.getElementById("course-desc").value;
   const price = document.getElementById("course-price").value;
   const duration = document.getElementById("course-duration").value;
-  const image = document.getElementById("course-image").value; // Get image URL
+  const image = document.getElementById("course-image").value;
 
-  // Validate input fields
   if (
     !title ||
     !category ||
@@ -338,15 +254,18 @@ function addCourse() {
     !description ||
     !price ||
     !duration ||
+    duration <= 0 ||
+    price <= 0 ||
     !image
   ) {
-    alert("Please fill all fields!");
+    alert(
+      "Please fill all fields! Price and duration must be positive values."
+    );
     return;
   }
 
   const coursesRef = database.ref("courses");
 
-  // Check for duplicate course title
   coursesRef
     .orderByChild("title")
     .equalTo(title)
@@ -363,20 +282,18 @@ function addCourse() {
         description,
         price,
         duration,
-        image, // Add image to the data
+        image,
       };
 
-      // Create a new reference for the course
       const newCourseRef = coursesRef.push();
-      newCourse.id = newCourseRef.key; // Set the ID for the new course
+      newCourse.id = newCourseRef.key;
 
-      // Push the new course to the database
       newCourseRef
         .set(newCourse)
         .then(() => {
           alert("Course added successfully!");
           closeForm("courseForm");
-          fetchCourses(); // Update the table after addition
+          fetchCourses();
         })
         .catch((error) => {
           alert("Error adding course: " + error.message);
@@ -384,13 +301,12 @@ function addCourse() {
     });
 }
 
-// دالة لجلب الكورسات وعرضها في الجدول
 function fetchCourses() {
   const coursesRef = database.ref("courses");
   coursesRef.on("value", (snapshot) => {
     const courses = snapshot.val();
     const tbody = document.querySelector("#courses tbody");
-    tbody.innerHTML = ""; // مسح المحتوى القديم
+    tbody.innerHTML = "";
 
     if (courses) {
       Object.keys(courses).forEach((key) => {
@@ -414,16 +330,14 @@ function fetchCourses() {
   });
 }
 
-// دالة لتحديث كورس
 function editCourse(courseId) {
   const courseRef = database.ref(`courses/${courseId}`);
 
   courseRef.once("value", (snapshot) => {
     const course = snapshot.val();
 
-    // جلب الفئات وتحديث القائمة المنسدلة قبل تعبئة البيانات
     const categorySelect = document.getElementById("edit-course-category");
-    categorySelect.innerHTML = ""; // مسح الخيارات القديمة
+    categorySelect.innerHTML = "";
 
     const categoriesRef = database.ref("categories");
     categoriesRef.once("value", (snapshot) => {
@@ -440,7 +354,6 @@ function editCourse(courseId) {
         });
       }
 
-      // بعد ملء الفئات، نضع باقي بيانات الكورس في النموذج
       document.getElementById("edit-course-title").value = course.title;
       document.getElementById("edit-instructor-name").value = course.instructor;
       document.getElementById("edit-course-desc").value = course.description;
@@ -450,7 +363,6 @@ function editCourse(courseId) {
       openForm("editCourseForm");
     });
 
-    // حفظ التحديثات
     document.querySelector("#editCourseForm .submit-btn").onclick = () => {
       const updatedCourse = {
         title: document.getElementById("edit-course-title").value,
@@ -466,7 +378,7 @@ function editCourse(courseId) {
         .then(() => {
           alert("Course updated successfully!");
           closeForm("editCourseForm");
-          fetchCourses(); // تحديث الجدول بعد التعديل
+          fetchCourses();
         })
         .catch((error) => {
           alert("Error updating course: " + error.message);
@@ -475,7 +387,6 @@ function editCourse(courseId) {
   });
 }
 
-// دالة لحذف كورس
 function deleteCourse(courseId) {
   if (confirm("Are you sure you want to delete this course?")) {
     const courseRef = database.ref(`courses/${courseId}`);
@@ -483,7 +394,7 @@ function deleteCourse(courseId) {
       .remove()
       .then(() => {
         alert("Course deleted successfully!");
-        fetchCourses(); // تحديث الجدول بعد الحذف
+        fetchCourses();
       })
       .catch((error) => {
         alert("Error deleting course: " + error.message);
@@ -491,7 +402,6 @@ function deleteCourse(courseId) {
   }
 }
 
-// دالة لإضافة فئة جديدة
 function addCategory() {
   const categoryName = document.getElementById("category-name").value;
 
@@ -506,35 +416,31 @@ function addCategory() {
     .then(() => {
       alert("Category added successfully!");
       closeForm("categoryForm");
-      fetchCategories(); // تحديث الجدول بعد الإضافة
+      fetchCategories();
     })
     .catch((error) => {
       alert("Error adding category: " + error.message);
     });
 }
 
-// دالة لجلب الفئات وعرضها في الجدول
 function fetchCategories() {
   const categoriesRef = database.ref("categories");
   categoriesRef.on("value", (snapshot) => {
     const categories = snapshot.val();
     const categorySelect = document.getElementById("course-category");
     const tbody = document.querySelector("#categories tbody");
-    tbody.innerHTML = ""; // مسح المحتوى القديم
+    tbody.innerHTML = "";
 
-    // مسح الخيارات القديمة
     categorySelect.innerHTML = "";
 
     if (categories) {
       Object.keys(categories).forEach((key) => {
         const category = categories[key];
-        // إضافة الفئات إلى الـ select
         const option = document.createElement("option");
         option.value = category.name;
         option.textContent = category.name;
         categorySelect.appendChild(option);
 
-        // إضافة الفئات إلى الجدول
         const row = `
                   <tr>
                       <td>${category.name}</td>
@@ -550,7 +456,6 @@ function fetchCategories() {
   });
 }
 
-// دالة لتحديث فئة
 function editCategory(categoryId) {
   const categoryRef = database.ref(`categories/${categoryId}`);
   categoryRef.once("value", (snapshot) => {
@@ -559,7 +464,6 @@ function editCategory(categoryId) {
 
     openForm("editCategoryForm");
 
-    // حفظ التحديثات
     document.querySelector("#editCategoryForm .submit-btn").onclick = () => {
       const updatedCategory = {
         name: document.getElementById("edit-category-name").value,
@@ -568,7 +472,6 @@ function editCategory(categoryId) {
       categoryRef
         .update(updatedCategory)
         .then(() => {
-          // تحديث الكورسات المرتبطة بهذه الفئة
           const coursesRef = database.ref("courses");
           coursesRef.once("value", (snapshot) => {
             const courses = snapshot.val();
@@ -585,7 +488,7 @@ function editCategory(categoryId) {
 
           alert("Category updated successfully!");
           closeForm("editCategoryForm");
-          fetchCategories(); // تحديث الجدول بعد التعديل
+          fetchCategories();
         })
         .catch((error) => {
           alert("Error updating category: " + error.message);
@@ -594,14 +497,12 @@ function editCategory(categoryId) {
   });
 }
 
-// دالة لحذف فئة
 function deleteCategory(categoryId) {
   if (confirm("Are you sure you want to delete this category?")) {
     const categoryRef = database.ref(`categories/${categoryId}`);
     categoryRef.once("value", (snapshot) => {
       const category = snapshot.val();
 
-      // حذف الكورسات المرتبطة بهذه الفئة
       const coursesRef = database.ref("courses");
       coursesRef.once("value", (snapshot) => {
         const courses = snapshot.val();
@@ -618,7 +519,7 @@ function deleteCategory(categoryId) {
         .remove()
         .then(() => {
           alert("Category deleted successfully!");
-          fetchCategories(); // تحديث الجدول بعد الحذف
+          fetchCategories();
         })
         .catch((error) => {
           alert("Error deleting category: " + error.message);
@@ -630,7 +531,7 @@ function deleteCategory(categoryId) {
 document.addEventListener("DOMContentLoaded", () => {
   fetchCourses();
   fetchCategories();
-  loadPendingRequests(); // تحميل الطلبات المعلقة عند فتح الصفحة
+  loadPendingRequests();
 });
 
 function enrollStudent(studentId, courseId) {
@@ -658,7 +559,7 @@ function enrollStudent(studentId, courseId) {
         console.log(
           `Student ${studentId} requested to enroll in course ${courseId}`
         );
-        loadPendingRequests(); // تحديث الطلبات بعد التسجيل
+        loadPendingRequests();
       })
       .catch((error) => {
         console.error("Error enrolling student:", error);
@@ -719,28 +620,6 @@ function loadPendingRequests() {
     });
 }
 
-// function approveEnrollment(studentId, courseId) {
-//   try {
-//     const studentCourseRef = database.ref(
-//       `students-courses/${studentId}_${courseId}`
-//     );
-
-//     studentCourseRef
-//       .update({
-//         status: "enrolled",
-//         progress: 0,
-//       })
-//       .then(() => {
-//         alert(`Student ${studentId} has been enrolled in course ${courseId}`);
-//         loadPendingRequests(); // تحديث الطلبات بعد الموافقة
-//       })
-//       .catch((error) => {
-//         console.error("Error approving enrollment:", error);
-//       });
-//   } catch (error) {
-//     console.error("Error approving enrollment:", error);
-//   }
-// }
 function approveEnrollment(studentId, courseId) {
   try {
     const studentCourseRef = database.ref(
@@ -753,11 +632,11 @@ function approveEnrollment(studentId, courseId) {
     studentCourseRef
       .update({
         status: "enrolled",
-        progress: 0, // التقدم يبدأ من 0
+        progress: 0,
       })
       .then(() => {
         alert(`Student ${studentId} has been enrolled in course ${courseId}`);
-        loadPendingRequests(); // تحديث الطلبات بعد الموافقة
+        loadPendingRequests();
       })
       .catch((error) => {
         console.error("Error approving enrollment:", error);
@@ -780,7 +659,7 @@ function rejectEnrollment(studentId, courseId) {
       .remove()
       .then(() => {
         alert(`Enrollment request for student ${studentId} has been removed.`);
-        loadPendingRequests(); // تحديث الطلبات بعد الرفض
+        loadPendingRequests();
       })
       .catch((error) => {
         console.error("Error rejecting enrollment:", error);
@@ -816,8 +695,6 @@ document.addEventListener("DOMContentLoaded", () => {
   console.log("Page loaded, fetching data...");
   fetchCourses();
   fetchCategories();
-
-  // التأكد من أن الدالة موجودة قبل استدعائها
   if (typeof fetchStudentProgress === "function") {
     fetchStudentProgress();
   } else {
@@ -825,44 +702,12 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-// function fetchStudentProgress() {
-//   const progressTable = document.getElementById("progressTableBody"); // تأكد من وجود tbody لعرض البيانات
-//   progressTable.innerHTML = ""; // مسح البيانات القديمة قبل التحديث
-
-//   database.ref("students-courses").once("value", (snapshot) => {
-//     console.log("📌 Student progress data:", snapshot.val()); // ✅ عرض البيانات في الكونسول للتأكد
-
-//     const data = snapshot.val();
-//     if (data) {
-//       Object.keys(data).forEach((key) => {
-//         const { progress, status } = data[key]; // استخراج البيانات
-//         const [studentId, courseId] = key.split("_"); // استخراج الـ studentId و courseId
-
-//         // ✅ إنشاء صف لكل طالب في الجدول
-//         const row = `
-//           <tr>
-//             <td>${studentId}</td>
-//             <td>${courseId}</td>
-
-//             <td>${progress}%</td>
-//             <td>
-//               <button onclick="updateStudentProgress('${studentId}', '${courseId}', 50)">Update to 50%</button>
-//             </td>
-//           </tr>
-//         `;
-//         progressTable.innerHTML += row; // إضافة الصف إلى الجدول
-//       });
-//     } else {
-//       progressTable.innerHTML = `<tr><td colspan="5">No student progress data available.</td></tr>`;
-//     }
-//   });
-// }
-
 async function fetchStudentProgress() {
   const progressTable = document.getElementById("progressTableBody");
   progressTable.innerHTML = "";
 
-  database.ref("students-courses").once("value", async (snapshot) => {
+  try {
+    const snapshot = await database.ref("students-courses").once("value");
     const data = snapshot.val();
     let hasApprovedStudents = false;
 
@@ -870,11 +715,19 @@ async function fetchStudentProgress() {
       for (const key of Object.keys(data)) {
         const { progress, status } = data[key];
         const [studentId, courseId] = key.split("_");
+
+        const studentFullData = await new Promise((resolve) => {
+          fetchUserById(studentId, (user) => {
+            resolve(user);
+          });
+        });
+
         const courseFullData = await new Promise((resolve) => {
           fetchCourseById(courseId, (course) => {
             resolve(course);
           });
         });
+
         if (status === "enrolled") {
           hasApprovedStudents = true;
           const alldata = await getStudentCourseData(studentId, courseId);
@@ -883,11 +736,13 @@ async function fetchStudentProgress() {
           const comment = alldata?.review?.comment || "No comments";
 
           const starIcons = generateStars(rating);
+          console.log(studentId);
+          console.log(studentFullData);
 
           const row = `
             <tr>
-              <td>${studentId}</td>
-              <td>${courseFullData.title}</td>
+              <td>${studentFullData?.email || studentId}</td>
+              <td>${courseFullData?.title || "Untitled Course"}</td>
               <td>
                 <div style="position: relative; width: 100px; background: #eee; border-radius: 5px;">
                   <div style="width: ${progress}%; background: green; height: 10px; border-radius: 5px;"></div>
@@ -909,7 +764,9 @@ async function fetchStudentProgress() {
     if (!hasApprovedStudents) {
       progressTable.innerHTML = `<tr><td colspan="5">No enrolled students yet.</td></tr>`;
     }
-  });
+  } catch (error) {
+    console.error("Error fetching student progress:", error);
+  }
 }
 
 function generateStars(rating) {
@@ -918,78 +775,10 @@ function generateStars(rating) {
   return filledStar.repeat(rating) + emptyStar.repeat(5 - rating);
 }
 
-// function fetchStudentProgress() {
-//   const coursesRef = database.ref("courses");
-//   const tableBody = document.getElementById("progressTableBody");
-//   tableBody.innerHTML = "";
-
-//   coursesRef.once("value", (snapshot) => {
-//       if (snapshot.exists()) {
-//           const courses = snapshot.val();
-//           Object.keys(courses).forEach((courseId) => {
-//               const course = courses[courseId];
-//               if (course.students) {
-//                   Object.keys(course.students).forEach((studentId) => {
-//                       const student = course.students[studentId];
-
-//                       // حساب نسبة التقدم
-//                       const progressPercentage = ((student.completedVideos / course.totalVideos) * 100).toFixed(1);
-
-//                       // إنشاء صف في الجدول
-//                       const row = document.createElement("tr");
-//                       row.innerHTML = `
-//                           <td>${student.name}</td>
-//                           <td>${course.title}</td>
-//                           <td>
-//                               <div class="progress-container">
-//                                   <div class="progress-bar" style="width: ${progressPercentage}%;">
-//                                       <span class="progress-text">${progressPercentage}%</span>
-//                                   </div>
-//                               </div>
-//                               <small>${student.completedVideos} / ${course.totalVideos} Videos</small>
-//                           </td>
-//                       `;
-//                       tableBody.appendChild(row);
-//                   });
-//               }
-//           });
-//       }
-//   });
-// }
-
-// document.addEventListener("DOMContentLoaded", function () {
-//   const database = firebase.database();
-
-//   const dummyData = {
-//       courses: {
-//           course1: {
-//               title: "JavaScript Basics",
-//               totalVideos: 10,
-//               students: {
-//                   student1: { name: "Ahmed Ali", completedVideos: 5 },
-//                   student2: { name: "Sara Mohamed", completedVideos: 8 }
-//               }
-//           },
-//           course2: {
-//               title: "Python for Beginners",
-//               totalVideos: 15,
-//               students: {
-//                   student3: { name: "Mohamed Tarek", completedVideos: 12 },
-//                   student4: { name: "Nour El-Din", completedVideos: 3 }
-//               }
-//           }
-//       }
-//   };
-
-//   database.ref().set(dummyData)
-//       .then(() => console.log("✅ Dummy data added successfully"))
-//       .catch((error) => console.error("❌ Error adding dummy data:", error));
-// });
-
-// تحميل البيانات عند فتح الصفحة
-
-// تحميل البيانات عند فتح الصفحة
 document.addEventListener("DOMContentLoaded", () => {
   fetchCourses();
   fetchCategories();
 });
+function logout() {
+  Storage.removeLocalData("userData");
+}

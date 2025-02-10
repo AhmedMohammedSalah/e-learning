@@ -134,12 +134,11 @@ document.addEventListener("DOMContentLoaded", function () {
         <p>Instructor: ${course.instructor || "Unknown"}</p>
         <p>Category: ${course.category || "General"}</p>
         <p>Duration: ${course.duration || "N/A"} hours</p>
-        <p>Price: ${course.price || "N/A"} LE</p>
+        <p>Price: ${course.price || "free"} LE</p>
         ${
           isMyCourses || course.isEnrolled
             ? `<button class="continue-btn" data-id="${course.id}">Continue Course</button>`
             : `
-              <p>${isMyCourses}:${course.isEnrolled}</p>
               <button class="enroll-btn" data-id="${course.id}">Enroll Now</button>
               <button class="viewcourse-btn" data-id="${course.id}">View Course</button>
             <button class="remove-wishlist-btn" data-id="${course.id}">Remove from Wishlist</button>
@@ -160,7 +159,7 @@ document.addEventListener("DOMContentLoaded", function () {
         <p>Instructor: ${course.instructor || "Unknown"}</p>
         <p>Category: ${course.category || "General"}</p>
         <p>Duration: ${course.duration || "N/A"} hours</p>
-        <p>Price: ${course.price || "N/A"} LE</p>
+        <p>Price: ${course.price || "free"} LE</p>
         ${
           isMyCourses || course.isEnrolled
             ? `<button class="continue-btn" data-id="${course.id}">Continue Course</button>`
@@ -229,27 +228,27 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function addEventListenersToButtons() {
-document.querySelectorAll(".enroll-btn").forEach((btn) =>
-  btn.addEventListener("click", async function () {
-    try {
-      const enrollmentStatus = await checkEnrollmentStatus(
-        studentId,
-        this.dataset.id
-      );
+    document.querySelectorAll(".enroll-btn").forEach((btn) =>
+      btn.addEventListener("click", async function () {
+        try {
+          const enrollmentStatus = await checkEnrollmentStatus(
+            studentId,
+            this.dataset.id
+          );
 
-      if (enrollmentStatus === "enrolled") {
-        alert("You are already enrolled in this course!");
-        return;
-      }
-      await enrollStudent(studentId, this.dataset.id);
-      alert("Enrollment request sent!");
-      window.location.href = `payment.html?id=${this.dataset.id}`;
-    } catch (error) {
-      console.error("Error during enrollment:", error);
-      alert("Error during enrollment. Please try again.");
-    }
-  })
-);
+          if (enrollmentStatus === "enrolled") {
+            alert("You are already enrolled in this course!");
+            return;
+          }
+          await enrollStudent(studentId, this.dataset.id);
+          alert("Enrollment request sent!");
+          window.location.href = `payment.html?id=${this.dataset.id}`;
+        } catch (error) {
+          console.error("Error during enrollment:", error);
+          alert("Error during enrollment. Please try again.");
+        }
+      })
+    );
 
     document.querySelectorAll(".wishlist-btn").forEach((btn) =>
       btn.addEventListener("click", function () {

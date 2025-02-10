@@ -439,3 +439,17 @@ function fetchLessons(courseId, callback) {
     throw error;
   }
 }
+function fetchUserById(uid, callback) {
+  try {
+    const userRef = database.ref(`users/${uid}`);
+    userRef.once("value", (snapshot) => {
+      const user = snapshot.val();
+      console.log(user);
+      
+      callback(user);
+    });
+  } catch (error) {
+    console.error("Error fetching user by ID:", error);
+    throw error;
+  }
+}
