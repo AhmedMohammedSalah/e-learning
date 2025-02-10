@@ -183,7 +183,8 @@ const handleLogin = async (event) => {
   const adminPassword = "admin123";
 
   if (email === adminEmail && password === adminPassword) {
-    alert("Admin login successful! Redirecting to Admin Dashboard...");
+    alert( "Admin login successful! Redirecting to Admin Dashboard..." );
+    Storage.saveLocalData("userData", { "email": email, "password":password });
     window.location.href = "./admin.html";
     return;
   }

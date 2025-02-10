@@ -224,13 +224,12 @@ function fetchLessons() {
 
 document.addEventListener("DOMContentLoaded", () => {
   const student = Storage.fetchLocalData("userData");
-
   const adminEmail = "admin@gmail.com";
   const adminPassword = "admin123";
   if (
     !student ||
-    student["email"] == adminEmail ||
-    student["email"] == adminPassword
+    student["email"] !== adminEmail ||
+    student["password"] !== adminPassword
   ) {
     window.location.href = "login.html";
     return;
