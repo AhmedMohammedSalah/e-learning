@@ -1,4 +1,4 @@
-// Utility Functions
+
 const validateEmail = (email) => {
   const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return regex.test(email);
@@ -119,52 +119,22 @@ const handleRegistration = async (event) => {
   }
 };
 
-// const handleLogin = async ( event ) => {
-//   event.preventDefault();
 
-//   const email = document.getElementById( "email" ).value;
-//   const password = document.getElementById( "password" ).value;
-//   // if ( email = "" && password= "") {
 
-//   //   return;
-//   // }
-//   // Validate email
-//   if (!validateEmail(email)) {
-//     showError("emailError", "Please enter a valid email address.");
-//     return;
-//   } else {
-//     clearError("emailError");
-//   }
 
-//   // Validate password
-//   if (!validatePassword(password)) {
-//     alert("Password must be at least 6 characters long.");
-//     return;
-//   }
-
-//   try {
-//     await loginUserWithFirebase(email, password);
-//     alert("Login successful! Redirecting to Home page...");
-//     window.location.href = "../../student.html";
-//   } catch (error) {
-//     alert("Error: " + error.message);
-//   }
-// };
-
-// Attach Event Listeners
 const handleLogin = async (event) => {
   event.preventDefault();
 
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value.trim();
 
-  // التحقق من الحقول الفارغة
+
   if (!email || !password) {
     alert("Please fill in all fields.");
     return;
   }
 
-  // التحقق من صحة البريد الإلكتروني
+  
   if (!validateEmail(email)) {
     showError("emailError", "Please enter a valid email address.");
     return;
@@ -172,7 +142,7 @@ const handleLogin = async (event) => {
     clearError("emailError");
   }
 
-  // التحقق من صحة كلمة المرور
+  
   if (!validatePassword(password)) {
     alert("Password must be at least 6 characters long.");
     return;
@@ -189,7 +159,7 @@ const handleLogin = async (event) => {
     return;
   }
 
-  // ** تسجيل الدخول للمستخدم العادي **
+  
   try {
     const userData = await loginUserWithFirebase(email, password);
     alert("Login successful! Redirecting to Home page...");
@@ -235,5 +205,5 @@ const assignUserToCourse = async (userId, courseId) => {
 };
 const logout = () => {
   alert("Logout successful! Redirecting to login page...");
-  window.location.href = "../../login.html"; // توجيه إلى صفحة تسجيل الدخول
+  window.location.href = "../../login.html"; 
 };
